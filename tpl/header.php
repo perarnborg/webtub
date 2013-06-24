@@ -44,8 +44,8 @@
     <div class="limiter">
       <nav>
         <ul>
-          <li class="about"><a href="/about">About</a></li>
-          <li class="settings"><a href="/settings">Settings</li>
+          <li class="link-about"><a href="/about">About</a></li>
+          <li class="link-settings"><a href="/settings">Settings</li>
         </ul>
       </nav>
       <h1 id="logo">
@@ -53,4 +53,18 @@
       </h1>
     </div>
   </header>
+  <div class="settings<?php echo $account->hasMissingRequiredSettings ? " expanded" : ""; ?>">
+    <div class="limiter">
+    <?php foreach($account->settings as $setting) { ?>
+      <label for="<?php echo $setting['key']; ?>" class="block"><?php echo $setting['name']; ?></label>
+      <?php if($setting['sourceEndpoint']) {
+        foreach($account->telldusData->data[$setting['sourceEndpoint']] as $item) {
+          echo '<div><input type="radio" name="' . $setting['key'] . '" id="' . $setting['key'] . '-' . $item['id'] . '"' . ($item['id'] == $setting['value'] ? ' selected="selected"' : '') . '><label for="' . $setting['key'] . '-' . $item['id'] . '">' . $item['name'] . '</label></div>';
+        }      
+      } else {
+        echo '<input type="text" maxlength="252" name="' . $setting['key'] . '" value="' . $setting['value'] . '" />';
+      } ?>
+    <?php } ?>
+    </div>
+  </div>
   <div id="main" class="limiter clearfix">

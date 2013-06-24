@@ -1,0 +1,12 @@
+**.svn
+.git
+.gitignore
+.project
+.settings
+deploy
+.buildpath
+*~
+*.bkp
+cache
+unittest/
+database/

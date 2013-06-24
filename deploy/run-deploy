@@ -1,0 +1,18 @@
+#!/bin/bash
+
+DIR="$( dirname "$0" )" && pwd
+DRY=""
+export DEPLOY_SOURCE_DIR="$DIR/../"
+export DEPLOY_DEST_DIR="/var/www/webtub/"
+export DEPLOY_SERVER="54.228.219.51"
+export DEPLOY_ACCOUNT="ubuntu"
+export DEPLOY_KEY="/Users/per/.ssh/perarnborg.pem"
+
+echo "deploying to $DEPLOY_SERVER"
+   echo "using manual password"
+   if [ "$1" = "-dry" ]; then
+      echo "Only dry run"
+      DRY="--dry-run"
+   fi
+   rsync --chmod=ug=rwX --rsh="ssh -i $DEPLOY_KEY" $DRY -axv --delete --exclude-from=$DIR/rsync-exclude \
+      $DEPLOY_SOURCE_DIR $DEPLOY_ACCOUNT@$DEPLOY_SERVER:$DEPLOY_DEST_DIR

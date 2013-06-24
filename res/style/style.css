@@ -428,4 +428,30 @@ a {
 
 header.global {
   background-color: #0066ff;
-  color: white; }
+  color: white;
+  position: relative; }
+  header.global:after {
+    background-image: none;
+    background-image: rgba(0, 0, 0, 0.075);
+    background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.15) 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.15)));
+    background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.15) 100%);
+    background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.15) 100%);
+    background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.15) 100%);
+    background-image: linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.15) 100%);
+    filter: none;
+    bottom: 0;
+    content: '';
+    height: 30px;
+    left: 0;
+    position: absolute;
+    right: 0; }
+  header.global h1 {
+    margin: 0; }
+
+.settings {
+  background: #55bbff;
+  padding-bottom: 10px; }
+  .settings label.block {
+    display: block;
+    padding-top: 10px; }

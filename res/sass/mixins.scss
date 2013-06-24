@@ -1,0 +1,110 @@
+@mixin border-radius($topleft, $topright, $bottomright, $bottomleft) {
+  -webkit-border-radius: $topleft $topright $bottomright $bottomleft;
+  -moz-border-radius: $topleft $topright $bottomright $bottomleft;
+  -o-border-radius: $topleft $topright $bottomright $bottomleft;
+  -ms-border-radius: $topleft $topright $bottomright $bottomleft;
+  border-radius: $topleft $topright $bottomright $bottomleft;
+}
+
+@mixin border-box {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+@mixin background-gradient-vertical($top-color, $bottom-color, $percentage:100%) {
+  background-image: none;
+  background-image: mix($top-color, $bottom-color);
+  background-image: -moz-linear-gradient(top, $top-color 0%, $bottom-color $percentage); // FF3.6+
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$top-color), color-stop($percentage,$bottom-color)); // Chrome,Safari4+
+  background-image: -webkit-linear-gradient(top, $top-color 0%,$bottom-color $percentage); // Chrome10+,Safari5.1+
+  background-image: -o-linear-gradient(top, $top-color 0%,$bottom-color $percentage); // Opera 11.10+
+  background-image: -ms-linear-gradient(top, $top-color 0%,$bottom-color $percentage); // IE10+
+  background-image: linear-gradient(top, $top-color 0%,$bottom-color $percentage); // W3C
+  filter: none; // IE6-9
+}
+@mixin background-gradient-horizontal($left-color, $right-color) {
+  background-image: none;
+  background-image: $left-color; // Old browsers
+  background-image: -moz-linear-gradient(left, $left-color 0%, $right-color 100%); // FF3.6+
+  background-image: -webkit-gradient(linear, left top, right top, color-stop(0%,$left-color), color-stop(100%,$right-color)); // Chrome,Safari4+
+  background-image: -webkit-linear-gradient(left, $left-color 0%,$right-color 100%); // Chrome10+,Safari5.1+
+  background-image: -o-linear-gradient(left, $left-color 0%,$right-color 100%); // Opera 11.10+
+  background-image: -ms-linear-gradient(left, $left-color 0%,$right-color 100%); // IE10+
+  background-image: linear-gradient(left, $left-color 0%,$right-color 100%); // W3C
+  filter: none; // IE6-9
+}
+@mixin background-gradient-radial($position, $start-color-stop, $stop-color-stop) {  
+  background-image: -webkit-radial-gradient($position, cover, $start-color-stop, $stop-color-stop);
+  background-image: -moz-radial-gradient($position, cover, $start-color-stop, $stop-color-stop);
+  background-image: -o-radial-gradient($position, cover, $start-color-stop, $stop-color-stop);
+  background-image: -ms-radial-gradient($position, cover, $start-color-stop, $stop-color-stop);
+  background-image: radial-gradient($position, cover, $start-color-stop, $stop-color-stop);
+  filter: none; // IE6-9
+}
+@mixin box-shadow($x: 0, $y: 0, $blur: 0, $color: rgba(0, 0, 0, 0.6), $inset: false){
+  @if $inset == inset {
+    $inset: "inset";
+  } @else {
+    $inset: "";
+  }
+  -webkit-box-shadow: $x $y $blur $color #{$inset};
+  -moz-box-shadow: $x $y $blur $color #{$inset};
+  -o-box-shadow: $x $y $blur $color #{$inset};
+  -ms-box-shadow: $x $y $blur $color #{$inset};
+  box-shadow: $x $y $blur $color #{$inset};
+}
+@mixin opacity ( $value: 0.5 ) {
+  opacity: $value;
+  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=" $value * 100 ")';
+  filter: alpha(opacity= $value * 100 );
+  zoom: 1;
+}
+@mixin transition($property, $duration: 200ms, $timingFunction: linear, $delay: 0s) {
+  -webkit-transition: $property $duration $timingFunction $delay;
+  -moz-transition: $property $duration $timingFunction $delay;
+  -ms-transition: $property $duration $timingFunction $delay;
+  -o-transition: $property $duration $timingFunction $delay;
+  transition: $property $duration $timingFunction $delay;
+}
+@mixin columncount($value) {
+	-moz-column-count: $value;
+	-moz-column-gap: $value*10px;
+	-webkit-column-count: $value;
+	-webkit-column-gap: $value*10px;
+	column-count: $value;
+	column-gap: $value*10px;
+}
+@mixin toparrow($size: 5px, $color: $color_white) {
+
+  position: relative;
+
+  &:after, &:before {
+    bottom: 100%;
+    left: 20px;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+
+  &:after {
+    border-bottom-color: $color;
+    border-width: $size;
+    margin-left: 0-$size;
+  }
+
+}
+@mixin text-shadow($value: rgba(0,0,0,0.3) 0 -1px 0) {
+	text-shadow: $value;
+}
+@mixin media-ltl {
+  @media only screen and (max-width: $breakpoint_small) { @content; }
+}
+@mixin media-gts {
+  @media only screen and (min-width: $breakpoint_small+1) { @content; }
+}
+@mixin media-retina {
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), screen and (max--moz-device-pixel-ratio: 2) { @content; }
+}
