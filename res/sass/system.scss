@@ -1,0 +1,50 @@
+/* SYSTEM */
+/* new clearfix */
+.clearfix:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+* html .clearfix             { zoom: 1; } /* IE6 */
+*:first-child+html .clearfix { zoom: 1; } /* IE7 */
+
+html {
+  overflow-y:scroll 
+}
+iframe {
+  border: none;
+  display: block;
+  overflow:hidden;
+}
+
+a {
+  outline:none;  
+}
+
+nav ul {
+  margin:0;
+  padding:0;
+}
+nav ul li {
+  list-style:none;
+}
+
+.hidden {
+  position: absolute !important;
+  height: 1px; width: 1px; 
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);  
+}
+
+.hidden-text {
+  display:block;
+  overflow:hidden;
+  text-indent:-9999px;  
+}
+
+.warning {
+  color:red;
+}
