@@ -9,15 +9,24 @@
 $root = (PHP_SAPI == 'cli' && empty($_SERVER['REMOTE_ADDR'])) ? '.' : $_SERVER['DOCUMENT_ROOT'];
 
 //Autoload functionality
-$incPaths = array('/webtub','/utils', '/utils/cacheImplements');
-set_include_path(config::libDir().implode(PATH_SEPARATOR.config::libDir(), $incPaths));
+// $incPaths = array('/webtub','/utils', '/utils/cacheImplements');
+// set_include_path(config::libDir().implode(PATH_SEPARATOR.config::libDir(), $incPaths));
 
-spl_autoload_extensions('.php');
-spl_autoload_register();
+// spl_autoload_extensions('.php');
+// spl_autoload_register();
 
-//webtub specific includes
+// includes
 require_once $root.'/config/db.php';
 require_once $root.'/config/webtub.php';
+
+require_once config::libDir().'/utils/timer.php';
+require_once config::libDir().'/utils/logger.php';
+require_once config::libDir().'/utils/includer.php';
+require_once config::libDir().'/utils/dbmgr.php';
+require_once config::libDir().'/utils/cookiemgr.php';
+require_once config::libDir().'/utils/lightopenid.php';
+require_once config::libDir().'/webtub/account.php';
+require_once config::libDir().'/webtub/telldusdata.php';
 
 session_start();
 cookieMgr::getInstance();
@@ -57,7 +66,7 @@ class config
   
   //---------DIRS---------//
   
-  private static function getRoot()
+  public static function getRoot()
   {
     $root = (PHP_SAPI == 'cli' && empty($_SERVER['REMOTE_ADDR'])) ? '.' : $_SERVER['DOCUMENT_ROOT'];
     return $root;

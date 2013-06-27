@@ -6,16 +6,10 @@ class account {
   {
     if($this->authenticated = $this->isAuthenticated()) 
     {
-      $this->email = $_SESSION['telldus_email'];
-      $this->fullname = $_SESSION['telldus_fullname'];      
+      $this->email = $_SESSION[webtub::sessionKeyEmail];
+      $this->fullname = $_SESSION[webtub::sessionKeyFullname];      
       $this->setAccount();
-      $this->token = $_SESSION['telldus_access_token'];
-      $this->tokenSecret = $_SESSION['telldus_access_token_secret'];
-      if(!$this->token || !$this->tokenSecret) {
-        $this->setTokens();
-      }
       $this->settings = $this->listSettings($this->email);
-      $this->telldusData = new telldusdata($this);
       foreach($this->settings as $setting) 
       {
         if($setting['required'] && !$setting['value']) {
@@ -25,26 +19,17 @@ class account {
     }
   }
   
-  private function isAuthenticated() {
-    return 
-      isset($_SESSION['telldus_email'])
-       && isset($_SESSION['telldus_access_token'])
-       && isset($_SESSION['telldus_access_token_secret']) 
-       && $_SESSION['telldus_email'] == telldus::testAccountEmail;
-  }
-  
   public function authenticate() {
     $lightOpenID = new LightOpenID();
     $lightOpenID->identity = 'http://login.telldus.com';
     $lightOpenID->required = array('contact/email', 'namePerson');
-    
     if (isset($_GET['openid_mode']) && $_GET['openid_mode'] == 'id_res') {
       if ($lightOpenID->validate()) {
         $data = $lightOpenID->getAttributes();
-        $_SESSION['telldus_email'] = $data['contact/email'];
-        $_SESSION['telldus_fullname'] = $data['namePerson'];
-        $_SESSION['telldus_access_token'] = telldus::token || false;
-        $_SESSION['telldus_access_token_secret'] = telldus::tokenSecret || false;
+        $_SESSION[webtub::sessionKeyEmail] = $data['contact/email'];
+        $_SESSION[webtub::sessionKeyFullname] = $data['namePerson'];
+        $_SESSION[webtub::sessionKeyAccessToken] = false;
+        $_SESSION[webtub::sessionKeyAccessTokenSecret] = false;
         return true;
       } else {
         return false;
@@ -62,9 +47,14 @@ class account {
       WHERE email=?';
     $db->query($sql, 's', $this->email);
     $account = $db->getRow();
-    if($account && $account['accessToken'] && $account['accessTokenSecret']) {
-      $_SESSION['telldus_access_token'] = $account['accessToken'];
-      $_SESSION['telldus_access_token_secret'] = $account['accessTokenSecret'];
+    if($account) {
+      if($account['accessToken'] && $account['accessTokenSecret']) {
+        $_SESSION[webtub::sessionKeyAccessToken] = $account['accessToken'];
+        $_SESSION[webtub::sessionKeyAccessTokenSecret] = $account['accessTokenSecret'];
+      } else if($_SESSION[webtub::sessionKeyAccessToken] && $_SESSION[webtub::sessionKeyAccessTokenSecret]) {
+        $sql = 'UPDATE `accounts` SET accessToken=?, accessTokenSecret=? WHERE email=?';
+        $db->query($sql, 'sss', $_SESSION['telldus_access_token'], $_SESSION['telldus_access_token_secret'], $this->email);
+      }
     } else {
       $db = new dbMgr();
       $sql = 'INSERT INTO `accounts` VALUES(NULL, ?, ?, NULL, NULL)';
@@ -74,17 +64,42 @@ class account {
     return;
   }
   
+  public function initTelldusData() {
+    $this->token = $_SESSION[webtub::sessionKeyAccessToken];
+    $this->tokenSecret = $_SESSION[webtub::sessionKeyAccessTokenSecret];
+    if(!$this->token || !$this->tokenSecret) {
+      $this->setTokens();
+    }
+    $this->telldusData = new telldusdata($this);    
+  }
+  
+  private function isAuthenticated() {
+    return 
+      isset($_SESSION[webtub::sessionKeyEmail]);
+  }
+  
   public function setTokens() {   
-    $consumer = new HTTP_OAuth_Consumer(telldus::publicKey, telldus::privateKey);
-    $consumer->getRequestToken(telldus::requestTokenUrl, 'http://' . $_SERVER['HTTP_HOST'] . '/access-token');
-    $_SESSION['token'] = $consumer->getToken();
-    $_SESSION['tokenSecret'] = $consumer->getTokenSecret();
-    $url = $consumer->getAuthorizeUrl(telldus::authorizeTokenUrl);
+    $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'));
+    $consumer->getRequestToken(constant('TELLDUS_REQUEST_TOKEN'), constant('TELLDUS_BASE_URL') . '/access-token');
+    $_SESSION[webtub::sessionKeyRequestToken] = $consumer->getToken();
+    $_SESSION[webtub::sessionKeyRequestTokenSecret] = $consumer->getTokenSecret();
+    $url = $consumer->getAuthorizeUrl(constant('TELLDUS_AUTHORIZE_TOKEN'));
     header('Location:'.$url);
   }
   
-  public function setAccessTokens() {
-    
+  public function setAccessTokens() {  
+    var_dump($_SESSION);
+    $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $_SESSION[webtub::sessionKeyRequestToken], $_SESSION[webtub::sessionKeyRequestTokenSecret]);
+    try {
+      $consumer->getAccessToken(constant('TELLDUS_ACCESS_TOKEN'));
+      $_SESSION[webtub::sessionKeyAccessToken] = $consumer->getToken();
+      $_SESSION[webtub::sessionKeyAccessTokenSecret] = $consumer->getTokenSecret();
+      var_dump($_SESSION);      
+    }
+    catch(Exception $ex)
+    {
+      var_dump($ex);
+    }
   }
   
   // List all settings

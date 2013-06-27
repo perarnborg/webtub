@@ -26,11 +26,17 @@ else
   switch($parameters[0])
   {
     case '':
+      $account->initTelldusData();
       includer::includeFiles(array('header.php', 'default.php', 'footer.php'), 
         array('account' => $account));
       break;
     case 'access-token':
-      $account->setAccessTokens();
+      if($account->setAccessTokens()) {
+        header('Location: /');
+      } else {
+        includer::includeFiles(array('header.php', 'login.php', 'footer.php'), 
+          array('account' => $account));        
+      }
       break;
     default:
       // Default to File not found
