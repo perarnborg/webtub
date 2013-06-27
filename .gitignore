@@ -1,4 +1,3 @@
 .DS_Store
 */.DS_Store
 config/db.php
-config/telldus.php
