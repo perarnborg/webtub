@@ -43,7 +43,7 @@ class config
   
   //PRINTALL, ALL, DEBUG, NOTICE, WARNING, ERROR, ALERT, NONE
   
-  const loggerSeverity = DEBUG;
+  const loggerSeverity = NOTICE;
   const backtrace = true;
   
   //---------CACHE--------//
