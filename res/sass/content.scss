@@ -1,6 +1,7 @@
 header.global {
   background-color: #0066ff;
   color: white;
+  padding: 10px 0;
   position: relative;
   &:after {
     @include background-gradient-vertical(rgba(0,0,0,0), rgba(0,0,0,0.15));
@@ -14,12 +15,73 @@ header.global {
   h1 {
     margin: 0;
   }
+  nav {
+    float: right;
+    padding-top: 10px;
+    li {
+      display: inline-block;
+      text-transform: uppercase;
+      font-size: 0.8em;
+    }
+  }
 }
 .settings {
   background: #55bbff;
-  padding-bottom: 10px;
+  padding-bottom: 20px;
   label.block {
     display: block;
     padding-top: 10px;
+  }
+  input[type=submit] {
+    margin-top: 10px;
+  }
+}
+.current {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  float: right;
+  padding: 20px;
+  width: 200px;
+  div+div {
+    margin-top: 10px;
+  }
+}
+.tub-time {
+  label {
+    display: inline-block;
+    margin-bottom: 15px;
+    width: 120px;
+  }
+  input[type=submit] {
+    margin: 10px 0 0 216px;
+  }
+}
+
+@media screen and (max-width : 660px) {
+  .current {
+    float: none;
+    margin-top: 20px;
+    width: 290px;
+  }
+}
+
+@media screen and (max-width : 400px) {
+  .current {
+    width: auto;
+  }  
+  .tub-time {
+    label {
+      display: block;
+      margin-bottom: 5px;
+      margin-top: 15px;
+      width: auto;
+    }
+    input[type=text] {
+      width: 100%;
+    }
+    input[type=submit] {
+      float: right;
+      margin-left: 0;
+    }
   }
 }

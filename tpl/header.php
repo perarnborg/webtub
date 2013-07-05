@@ -16,7 +16,7 @@
 <meta property="og:url" content="http://<?php echo $_SERVER['HTTP_HOST']; ?><?php echo $_SERVER['REQUEST_URI']; ?>">
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="en_US" />
-<meta name="viewport" content="width=1050">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <!--meta property="fb:app_id" content="193334507468525" /-->
 <link rel="shortcut icon" href="/favicon.ico">  
 <link rel="profile" href="http://gmpg.org/xfn/11" />
@@ -26,6 +26,7 @@
 <![endif]-->
 <script src="/res/script/jquery.min.js"></script>
 <script src="/res/script/modernizr.js"></script>
+<script src="/res/script/jquery-ui-1.10.3.custom.min.js"></script>
 <script src="/res/script/jquery.ui.touch-punch.min.js"></script>
 <script src="/res/script/common.js"></script>
 <!--script type="text/javascript">
@@ -44,8 +45,9 @@
     <div class="limiter">
       <nav>
         <ul>
-          <li class="link-about"><a href="/about">About</a></li>
-          <li class="link-settings"><a href="/settings">Settings</li>
+          <?php if(isset($account)): ?>
+          <li class="link-settings js-toggle-settings"><a href="/settings">Settings</li>
+          <?php endif; ?>
         </ul>
       </nav>
       <h1 id="logo">
@@ -53,18 +55,29 @@
       </h1>
     </div>
   </header>
-  <div class="settings<?php echo $account->hasMissingRequiredSettings ? " expanded" : ""; ?>">
+  <?php if(isset($account)): ?>
+  <div class="settings js-settings<?php echo $account->hasMissingRequiredSettings ? "" : " hide"; ?>">
     <div class="limiter">
-    <?php foreach($account->settings as $setting) { ?>
-      <label for="<?php echo $setting['key']; ?>" class="block"><?php echo $setting['name']; ?></label>
-      <?php if($setting['sourceEndpoint']) {
-        foreach($account->telldusData->data[$setting['sourceEndpoint']] as $item) {
-          echo '<div><input type="radio" name="' . $setting['key'] . '" id="' . $setting['key'] . '-' . $item['id'] . '"' . ($item['id'] == $setting['value'] ? ' selected="selected"' : '') . '><label for="' . $setting['key'] . '-' . $item['id'] . '">' . $item['name'] . '</label></div>';
-        }      
-      } else {
-        echo '<input type="text" maxlength="252" name="' . $setting['key'] . '" value="' . $setting['value'] . '" />';
-      } ?>
-    <?php } ?>
+      <form action="/post/settings" method="post">
+      <?php
+      foreach($account->settings as $setting) { 
+      ?>
+        <label for="<?php echo $setting['key']; ?>" class="block"><?php echo $setting['name']; ?> <?php if($setting['required']): echo '*'; endif; ?></label>
+        <?php if(isset($setting['values'])) {
+          foreach($setting['values'] as $item) {
+            echo '<div><input type="radio" name="' . $setting['key'] . '" id="' . $setting['key'] . '-' . $item->id . '" value="' . $item->id . '"' . ($item->id == $setting['value'] ? ' checked="checked"' : '') . '> <label for="' . $setting['key'] . '-' . $item->id . '">' . $item->id . ' - ' . $item->name . '</label></div>';
+          }      
+        } else {
+          echo '<input type="text" maxlength="252" name="' . $setting['key'] . '" value="' . $setting['value'] . '" />';
+        } ?>
+      <?php 
+      }
+      ?>
+      <div>
+      <input type="submit" value="Save changes" />
+      </div>
+      </form>
     </div>
   </div>
+  <?php endif; ?>
   <div id="main" class="limiter clearfix">

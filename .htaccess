@@ -1,6 +1,12 @@
 <ifModule mod_rewrite.c>
 	RewriteEngine on
 	#RewriteBase /
+	
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^ajax/(.*)$ /ajax.php?p=$1 [L,QSA]
+
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^cron/(.*)$ /cron.php?p=$1 [L,QSA]
 
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d

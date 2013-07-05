@@ -23,6 +23,7 @@ require_once config::libDir().'/utils/timer.php';
 require_once config::libDir().'/utils/logger.php';
 require_once config::libDir().'/utils/includer.php';
 require_once config::libDir().'/utils/dbmgr.php';
+require_once config::libDir().'/utils/dbexception.php';
 require_once config::libDir().'/utils/cookiemgr.php';
 require_once config::libDir().'/utils/lightopenid.php';
 require_once config::libDir().'/webtub/account.php';

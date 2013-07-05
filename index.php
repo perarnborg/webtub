@@ -38,13 +38,36 @@ else
           array('account' => $account));        
       }
       break;
+    case 'post':
+      $pageExists = false;
+      switch($parameters[1])
+      {
+        case 'settings':
+          $account->updateSettings($_POST);
+          header('Location: /');
+          $pageExists = true;
+          break;
+        case 'tubtime':
+          $time = strtotime($_POST['date'] . ' ' . $_POST['time']);
+          $temp =  floatval(str_replace(',','.',$_POST['temp']));
+          if($time && $temp) {
+            $account->updateOrCreateTubTime($time, $temp);            
+            header('Location: /');
+            $pageExists = true;
+          }
+          break;
+      }
+      if($pageExists)
+      {
+        break;
+      }
     default:
       // Default to File not found
       logger::log('File not found: ' . $_SERVER['REQUEST_URI'], WARNING);
       header("HTTP/1.0 404 Not Found");
       $pageTitle = 'Page not found | ' . webtub::pageTitle;
       includer::includeFiles(array('header.php','404.php','footer.php'), 
-        array('httpResponseError' => true, 'pageTitle' => $pageTitle, 'account' => $account));
+        array('httpResponseError' => true, 'pageTitle' => $pageTitle));
       break;
   }
 }

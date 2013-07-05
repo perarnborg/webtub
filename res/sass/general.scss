@@ -1,8 +1,26 @@
 .limiter {
   margin: 0 auto;
-  max-width: 800px;
+  max-width: 680px;
+  padding: 0 20px;
 }
 a {
   color: inherit;
   text-decoration: none;
+}
+h2 {
+  font-size: 1.3em;
+  font-weight: normal;
+}
+.hide {
+  display: none;
+}
+.borderbox { @include border-box(); }
+input[type=text] {
+  height: 34px;
+  width: 200px;
+  @extend .borderbox;
+}
+input[type=submit] {
+  height: 40px;
+  padding: 0 40px;
 }
