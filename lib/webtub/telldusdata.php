@@ -19,6 +19,7 @@ class telldusdata {
           $lastChecked = null;
           $this->data['tubTemp'] = $this->getSensorTemp($this->account->settings['tubSensorId']['value'], $lastChecked);
           $this->data['tubLastChecked'] = $lastChecked;
+          $this->data['tubLastCheckedRecently'] = ($lastChecked + 1800) > time();
         }
         if(isset($this->account->settings['tubDeviceId']) && $this->account->settings['tubDeviceId']['value'])
         {

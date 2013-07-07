@@ -1378,6 +1378,14 @@ header.global {
   .settings input[type=submit] {
     margin-top: 10px; }
 
+.off {
+  color: red;
+  font-weight: bold; }
+
+.on {
+  color: green;
+  font-weight: bold; }
+
 .current {
   border: 1px solid #cccccc;
   border-radius: 5px;
@@ -1387,12 +1395,14 @@ header.global {
   .current div + div {
     margin-top: 10px; }
 
-.tub-time label {
-  display: inline-block;
-  margin-bottom: 15px;
-  width: 120px; }
-.tub-time input[type=submit] {
-  margin: 10px 0 0 216px; }
+.tub-time {
+  padding-bottom: 20px; }
+  .tub-time label {
+    display: inline-block;
+    margin-bottom: 15px;
+    width: 120px; }
+  .tub-time input[type=submit] {
+    margin: 10px 0 0 216px; }
 
 @media screen and (max-width: 660px) {
   .current {

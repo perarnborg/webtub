@@ -36,6 +36,14 @@ header.global {
     margin-top: 10px;
   }
 }
+.off {
+  color: red;
+  font-weight: bold;
+}
+.on {
+  color: green;
+  font-weight: bold;
+}
 .current {
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -47,6 +55,7 @@ header.global {
   }
 }
 .tub-time {
+  padding-bottom: 20px;
   label {
     display: inline-block;
     margin-bottom: 15px;

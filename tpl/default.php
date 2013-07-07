@@ -10,11 +10,11 @@
 <?php endif; ?>
 <?php if(!is_null($account->telldusData->data['tubStateOn'])): ?>
   <div>
-  The tub is turned <span class="js-tub-state"><?php echo $account->telldusData->data['tubStateOn'] ? "on" : "off" ?></span>
+  The tub is turned <span class="js-tub-state <?php echo $account->telldusData->data['tubStateOn'] ? "on" : "off" ?>"><?php echo $account->telldusData->data['tubStateOn'] ? "on" : "off" ?></span>
   </div>
 <?php endif; ?>
   <div>
-  Last checked <span class="js-last-checked"><?php echo date('H:i', $account->telldusData->data['tubLastChecked']); ?></span>
+  Last checked <span class="js-last-checked <?php if($account->telldusData->data['tubLastCheckedRecently']): ?>off<?php endif; ?>"><?php echo date('H:i', $account->telldusData->data['tubLastChecked']); ?></span>
   </div>
 </div>
 <?php endif; ?>
