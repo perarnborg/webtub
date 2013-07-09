@@ -26,7 +26,7 @@ else
   switch($parameters[0])
   {
     case '':
-      if($account->initTelldusData() || true) 
+      if($account->initTelldusData()) 
       {
         includer::includeFiles(array('header.php', 'default.php', 'footer.php'), 
           array('account' => $account));
