@@ -31,10 +31,52 @@ $(document).ready(function(){
   }
 });
 function validateTubTime() {
-  return true;
+  var dateOk = false;
+  var timeOk = false;
+  var tempOk = false;
+  if($("#js-date").val().length > 0) {
+    var date = formatDate(new Date($("#js-date").val()));
+    var today = formatDate(new Date());
+    if(date && date >= today) {
+      dateOk = true;
+    }
+  }
+  if($("#js-time").val().length > 0) {
+    var time = $("#js-time").val().replace(":", '');    
+    if(time.match(/^\d{1,2}\d{2}$/)) {
+      $("#js-time").val(time);
+      timeOk = true;
+    }
+  }
+  if($("#js-temp").val().length > 0) {
+    var temp = parseFloat($("#js-temp").val().replace(",", "."));    
+    if(temp > 5 && temp < 50) {
+      $("#js-temp").val(temp);
+      tempOk = true;
+    }
+  }
+  if(!dateOk) {
+    $("#js-date").addClass("invalid");
+  } else {
+    $("#js-date").removeClass("invalid");
+  }
+  if(!timeOk) {
+    $("#js-time").addClass("invalid");
+  } else {
+    $("#js-time").removeClass("invalid");
+  }
+  if(!tempOk) {
+    $("#js-temp").addClass("invalid");
+  } else {
+    $("#js-temp").removeClass("invalid");
+  }
+  return dateOk && timeOk && tempOk;
 }
 function formatDate(date) {
-  return '' + date.getFullYear() + (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1) + (date.getDate() < 10 ? '0' : '') + date.getDate();
+  if(date != "Invalid Date" && typeof(date) == "object" && typeof(date.getFullYear) == "function") {
+    return '' + date.getFullYear() + '-' + (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1) + '-' + (date.getDate() < 10 ? '0' : '') + date.getDate();    
+  }
+  return false;
 }
 function parseDate(input, format) {
   format = format || 'yyyy-mm-dd'; // default format

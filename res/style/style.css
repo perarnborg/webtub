@@ -1333,6 +1333,8 @@ h2 {
 input[type=text] {
   height: 34px;
   width: 200px; }
+  input[type=text].invalid {
+    border: 1px solid red; }
 
 input[type=submit] {
   height: 40px;

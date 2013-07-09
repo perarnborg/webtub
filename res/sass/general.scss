@@ -19,6 +19,9 @@ input[type=text] {
   height: 34px;
   width: 200px;
   @extend .borderbox;
+  &.invalid {
+    border: 1px solid red;
+  }
 }
 input[type=submit] {
   height: 40px;
