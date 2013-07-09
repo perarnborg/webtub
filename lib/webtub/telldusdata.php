@@ -1,7 +1,7 @@
 <?php
 class telldusdata {
   private $token, $tokenSecret;
-  public $account, $data = array();
+  public $account, $data = array(), $errorMessage;
   
   public function __construct($account)
   {
@@ -12,22 +12,29 @@ class telldusdata {
       $this->tokenSecret = $this->account->tokenSecret;
       if($this->account->authenticated) 
       {
-        $this->data['sensors'] = $this->listSensors();
-        $this->data['devices'] = $this->listDevices();
-        if(isset($this->account->settings['tubSensorId']) && $this->account->settings['tubSensorId']['value'])
+        try
         {
-          $lastChecked = null;
-          $this->data['tubTemp'] = $this->getSensorTemp($this->account->settings['tubSensorId']['value'], $lastChecked);
-          $this->data['tubLastChecked'] = $lastChecked;
-          $this->data['tubLastCheckedRecently'] = ($lastChecked + 1800) > time();
+          $this->data['sensors'] = $this->listSensors();
+          $this->data['devices'] = $this->listDevices();
+          if(isset($this->account->settings['tubSensorId']) && $this->account->settings['tubSensorId']['value'])
+          {
+            $lastChecked = null;
+            $this->data['tubTemp'] = $this->getSensorTemp($this->account->settings['tubSensorId']['value'], $lastChecked);
+            $this->data['tubLastChecked'] = $lastChecked;
+            $this->data['tubLastCheckedRecently'] = ($lastChecked + 1800) > time();
+          }
+          if(isset($this->account->settings['tubDeviceId']) && $this->account->settings['tubDeviceId']['value'])
+          {
+            $this->data['tubStateOn'] = $this->getDeviceState($this->account->settings['tubDeviceId']['value']);          
+          }
+          if(isset($this->account->settings['airSensorId']) && $this->account->settings['airSensorId']['value'])
+          {
+            $this->data['airTemp'] = $this->getSensorTemp($this->account->settings['airSensorId']['value']);
+          }
         }
-        if(isset($this->account->settings['tubDeviceId']) && $this->account->settings['tubDeviceId']['value'])
+        catch(Exception $ex)
         {
-          $this->data['tubStateOn'] = $this->getDeviceState($this->account->settings['tubDeviceId']['value']);          
-        }
-        if(isset($this->account->settings['airSensorId']) && $this->account->settings['airSensorId']['value'])
-        {
-          $this->data['airTemp'] = $this->getSensorTemp($this->account->settings['airSensorId']['value']);
+          $this->errorMessage = $ex->getMessage();
         }
       }
     }
@@ -69,7 +76,19 @@ class telldusdata {
       'supportedMethods' => constant('TELLDUS_TELLSTICK_TURNON') | constant('TELLDUS_TELLSTICK_TURNON'),
     );
     $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/sensors/list', $params, 'GET');
-    return json_decode($response->getBody())->sensor;
+    $body = json_decode($response->getBody());
+    if(isset($body->error) && $body->error)
+    {
+      throw new Exception($body->error);
+    }
+    else if(!isset($body->sensor))
+    {
+      throw new Exception("Unexpected result in listSensors");
+    }
+    else
+    {
+      return $body->sensor;
+    }
   }
   
   private function listDevices() {
@@ -78,7 +97,19 @@ class telldusdata {
       'supportedMethods' => constant('TELLDUS_TELLSTICK_TURNON') | constant('TELLDUS_TELLSTICK_TURNON'),
     );
     $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/devices/list', $params, 'GET');
-    return json_decode($response->getBody())->device;
+    $body = json_decode($response->getBody());
+    if(isset($body->error) && $body->error)
+    {
+      throw new Exception($body->error);
+    }
+    else if(!isset($body->device))
+    {
+      throw new Exception("Unexpected result in listDevices");
+    }
+    else
+    {
+      return $body->device;
+    } 
   }
   
   private function getSensor($id) {
@@ -87,7 +118,15 @@ class telldusdata {
       'id' => $id,
     );
     $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/sensor/info', $params, 'GET');
-    return json_decode($response->getBody());
+    $body = json_decode($response->getBody());
+    if(isset($body->error) && $body->error)
+    {
+      throw new Exception($body->error);
+    }
+    else
+    {
+      return $body;
+    } 
   }
   
   private function getDevice($id) {
@@ -97,7 +136,15 @@ class telldusdata {
       'supportedMethods' => constant('TELLDUS_TELLSTICK_TURNON') | constant('TELLDUS_TELLSTICK_TURNON'),
     );
     $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/device/info', $params, 'GET');
-    return json_decode($response->getBody());
+    $body = json_decode($response->getBody());
+    if(isset($body->error) && $body->error)
+    {
+      throw new Exception($body->error);
+    }
+    else
+    {
+      return $body;
+    } 
   }
   
   public function turnOnDevice($id) {
@@ -106,7 +153,15 @@ class telldusdata {
       'id' => $id,
     );
     $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/device/turnOn', $params, 'GET');
-    return json_decode($response->getBody());
+    $body = json_decode($response->getBody());
+    if(isset($body->error) && $body->error)
+    {
+      throw new Exception($body->error);
+    }
+    else
+    {
+      return $body;
+    } 
   }
   
   public function turnOffDevice($id) {
@@ -115,15 +170,30 @@ class telldusdata {
       'id' => $id,
     );
     $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/device/turnOff', $params, 'GET');
-    return json_decode($response->getBody());
+    $body = json_decode($response->getBody());
+    if(isset($body->error) && $body->error)
+    {
+      throw new Exception($body->error);
+    }
+    else
+    {
+      return $body;
+    } 
   }
   
   private function getUserProfile() {
     $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
     $params = array(
     );
-    $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/user/profile', $params, 'GET');
-    return json_decode($response->getBody());
+    $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/user/profile', $params, 'GET');$body = json_decode($response->getBody());
+    if(isset($body->error) && $body->error)
+    {
+      throw new Exception($body->error);
+    }
+    else
+    {
+      return $body;
+    } 
   }
 }
 ?>

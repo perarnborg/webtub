@@ -26,9 +26,17 @@ else
   switch($parameters[0])
   {
     case '':
-      $account->initTelldusData();
-      includer::includeFiles(array('header.php', 'default.php', 'footer.php'), 
-        array('account' => $account));
+      if($account->initTelldusData()) 
+      {
+        includer::includeFiles(array('header.php', 'default.php', 'footer.php'), 
+          array('account' => $account));
+      }
+      else
+      {
+        logger::log("Telldus integration error. " . $account->telldusData->errorMessage, ERROR);
+        includer::includeFiles(array('header.php', '500.php', 'footer.php'), 
+          array('httpResponseError' => true));
+      }
       break;
     case 'access-token':
       if($account->setAccessTokens()) {

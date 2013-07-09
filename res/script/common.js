@@ -30,6 +30,9 @@ $(document).ready(function(){
     $("#js-date").datepicker({minDate: new Date(), dateFormat: "yy-mm-dd"});
   }
 });
+function validateTubTime() {
+  return true;
+}
 function formatDate(date) {
   return '' + date.getFullYear() + (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1) + (date.getDate() < 10 ? '0' : '') + date.getDate();
 }

@@ -72,17 +72,25 @@ class account {
       $this->setTokens();
     }
     $this->telldusData = new telldusdata($this);
-    $settings = array();
-    foreach($this->settings as $setting) {
-      if($setting['sourceEndpoint']) {
-        $setting['values'] = array();
-        if(isset($this->telldusData->data[$setting['sourceEndpoint']])) {
-          $setting['values'] = $this->telldusData->data[$setting['sourceEndpoint']];
+    if(!$this->telldusData->errorMessage)
+    {    
+      $settings = array();
+      foreach($this->settings as $setting) {
+        if($setting['sourceEndpoint']) {
+          $setting['values'] = array();
+          if(isset($this->telldusData->data[$setting['sourceEndpoint']])) {
+            $setting['values'] = $this->telldusData->data[$setting['sourceEndpoint']];
+          }
         }
+        $settings[$setting['key']] = $setting;
       }
-      $settings[$setting['key']] = $setting;
+      $this->settings = $settings;
+      return true;
     }
-    $this->settings = $settings;
+    else
+    {
+      return false;
+    }
   }
   
   private function isAuthenticated() {
@@ -96,6 +104,7 @@ class account {
     $_SESSION[webtub::sessionKeyRequestToken] = $consumer->getToken();
     $_SESSION[webtub::sessionKeyRequestTokenSecret] = $consumer->getTokenSecret();
     $url = $consumer->getAuthorizeUrl(constant('TELLDUS_AUTHORIZE_TOKEN'));
+    var_dump($url);die();
     header('Location:'.$url);
   }
   
