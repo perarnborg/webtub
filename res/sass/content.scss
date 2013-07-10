@@ -22,6 +22,18 @@ header.global {
       display: inline-block;
       text-transform: uppercase;
       font-size: 0.8em;
+      &.link-settings {
+        a {
+          @extend .hidden-text;
+          background: url(../img/settings-hd.png) no-repeat;
+          background-size: 29px 30px;
+          display: block;
+          position: relative;
+          height: 29px;
+          top: -8px;
+          width: 30px;
+        }
+      }
     }
   }
 }

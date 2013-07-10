@@ -410,7 +410,7 @@ nav ul li {
   overflow: hidden;
   clip: rect(1px, 1px, 1px, 1px); }
 
-.hidden-text {
+.hidden-text, header.global nav li.link-settings a {
   display: block;
   overflow: hidden;
   text-indent: -9999px; }
@@ -1311,7 +1311,7 @@ nav ul li {
 
 .limiter {
   margin: 0 auto;
-  max-width: 680px;
+  max-width: 600px;
   padding: 0 20px; }
 
 a {
@@ -1370,6 +1370,14 @@ header.global {
       display: inline-block;
       text-transform: uppercase;
       font-size: 0.8em; }
+      header.global nav li.link-settings a {
+        background: url(../img/settings-hd.png) no-repeat;
+        background-size: 29px 30px;
+        display: block;
+        position: relative;
+        height: 29px;
+        top: -8px;
+        width: 30px; }
 
 .settings {
   background: #55bbff;
