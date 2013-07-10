@@ -1371,8 +1371,7 @@ header.global {
       text-transform: uppercase;
       font-size: 0.8em; }
       header.global nav li.link-settings a {
-        background: url(../img/settings-hd.png) no-repeat;
-        background-size: 29px 30px;
+        background: url(../img/settings.png) no-repeat;
         display: block;
         position: relative;
         height: 29px;
@@ -1433,3 +1432,8 @@ header.global {
   .tub-time input[type=submit] {
     float: right;
     margin-left: 0; } }
+/* Retina adjustments */
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  header.global nav li.link-settings a {
+    background: url(../img/settings-hd.png) no-repeat;
+    background-size: 29px 30px; } }
