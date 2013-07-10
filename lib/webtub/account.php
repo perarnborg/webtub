@@ -20,6 +20,18 @@ class account {
     }
   }
   
+  public function logout()
+  {
+    if($this->authenticated = $this->isAuthenticated()) 
+    {
+      unset($_SESSION[webtub::sessionKeyEmail]);
+      unset($_SESSION[webtub::sessionKeyFullname]);
+      unset($_SESSION[webtub::sessionKeyAccessToken]);
+      unset($_SESSION[webtub::sessionKeyAccessTokenSecret]);
+      session_destroy();
+    }
+  }
+  
   public function authenticate() {
     $lightOpenID = new LightOpenID();
     $lightOpenID->identity = 'http://login.telldus.com';
@@ -79,7 +91,23 @@ class account {
         if($setting['sourceEndpoint']) {
           $setting['values'] = array();
           if(isset($this->telldusData->data[$setting['sourceEndpoint']])) {
+            $valueExistsInValues = false;
             $setting['values'] = $this->telldusData->data[$setting['sourceEndpoint']];
+            foreach($setting['values'] as $value)
+            {
+              if($value->id == $setting['value'])
+              {
+                $valueExistsInValues = true;
+              }
+            }
+            if(!$valueExistsInValues)
+            {
+              $setting['value'] = NULL;
+              if($setting['required'])
+              {
+                $this->hasMissingRequiredSettings = true;
+              }
+            }
           }
         }
         $settings[$setting['key']] = $setting;
@@ -104,7 +132,6 @@ class account {
     $_SESSION[webtub::sessionKeyRequestToken] = $consumer->getToken();
     $_SESSION[webtub::sessionKeyRequestTokenSecret] = $consumer->getTokenSecret();
     $url = $consumer->getAuthorizeUrl(constant('TELLDUS_AUTHORIZE_TOKEN'));
-    var_dump($url);die();
     header('Location:'.$url);
   }
   

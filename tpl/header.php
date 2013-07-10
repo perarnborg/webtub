@@ -58,6 +58,8 @@
   <?php if(isset($account)): ?>
   <div class="settings js-settings<?php echo $account->hasMissingRequiredSettings ? "" : " hide"; ?>">
     <div class="limiter">
+      <br/>
+      Logged in as <?php echo $_SESSION[webtub::sessionKeyEmail]; ?>
       <form action="/post/settings" method="post">
       <?php
       foreach($account->settings as $setting) { 

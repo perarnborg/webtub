@@ -1309,6 +1309,9 @@ nav ul li {
   filter: Alpha(Opacity=20);
   border-radius: 5px; }
 
+body {
+  padding-bottom: 40px; }
+
 .limiter {
   margin: 0 auto;
   max-width: 600px;

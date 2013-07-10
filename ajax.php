@@ -22,7 +22,8 @@ switch($parameters[0])
       'tubTemp' => isset($account->telldusData->data['tubTemp']) ? $account->telldusData->data['tubTemp'] : false,
       'tubStateOn' => isset($account->telldusData->data['tubStateOn']) ? $account->telldusData->data['tubStateOn'] : null,
       'airTemp' => isset($account->telldusData->data['airTemp']) ? $account->telldusData->data['airTemp'] : false,
-      'lastChecked' => isset($account->telldusData->data['lastChecked']) ? '<span class="' . ($account->telldusData->data['tubLastCheckedRecently'] ? "" : "off") . date("H:i", $account->telldusData->data['lastChecked']) . '</span>' : false,
+      'lastChecked' => date("H:i", $account->telldusData->data['tubLastChecked']),
+      'lastCheckedRecently' => $account->telldusData->data['tubLastCheckedRecently'],
     );
     echo json_encode($current);
     break;

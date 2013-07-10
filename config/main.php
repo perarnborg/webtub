@@ -24,13 +24,14 @@ require_once config::libDir().'/utils/logger.php';
 require_once config::libDir().'/utils/includer.php';
 require_once config::libDir().'/utils/dbmgr.php';
 require_once config::libDir().'/utils/dbexception.php';
-require_once config::libDir().'/utils/cookiemgr.php';
+require_once config::libDir().'/utils/acache.php';
+require_once config::libDir().'/utils/cacheImplements/filecache.php';
+require_once config::libDir().'/utils/cacheImplements/memorycache.php';
 require_once config::libDir().'/utils/lightopenid.php';
 require_once config::libDir().'/webtub/account.php';
 require_once config::libDir().'/webtub/telldusdata.php';
 
 session_start();
-cookieMgr::getInstance();
 
 class config
 {  
@@ -48,13 +49,13 @@ class config
   
   //---------CACHE--------//
   
-  const timeToLive = 10800;
+  const timeToLive = 600;
   public static function memcacheServers() 
   {
     return (array(array('host'=>'127.0.0.1', 'port'=>'11211', 'weight'=>0)));
   }
   
-  //could be one of the following: file, no, db, mem
+  //could be one of the following: file, no, db, memory
   const activeCache = 'file';
   
   //get the curently active cache

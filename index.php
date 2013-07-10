@@ -69,6 +69,10 @@ else
       {
         break;
       }
+    case 'logout':
+      $account->logout();
+      header('Location: /');
+      break;
     default:
       // Default to File not found
       logger::log('File not found: ' . $_SERVER['REQUEST_URI'], WARNING);

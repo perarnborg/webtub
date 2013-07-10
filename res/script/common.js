@@ -12,6 +12,11 @@ $(document).ready(function(){
           if(data && data.tubTemp) {
             $(".js-tub-temp").html(data.tubTemp);
             $(".js-last-checked").html(data.lastChecked);
+            if(data.lastCheckedRecently) {
+              $(".js-last-checked").removeClass("off");              
+            } else {
+              $(".js-last-checked").addClass("off");              
+            }            
             if(data.airTemp) {
               $(".js-air-temp").html(data.airTemp);              
             }

@@ -1,10 +1,11 @@
 <?php
 class telldusdata {
-  private $token, $tokenSecret;
+  private $token, $tokenSecret, $cache;
   public $account, $data = array(), $errorMessage;
   
   public function __construct($account)
   {
+    $this->cache = config::getCache();
     if($account) 
     {
       $this->account = $account;
@@ -71,6 +72,10 @@ class telldusdata {
   }
   
   private function listSensors() {
+    if(($cached = $this->cache->getCache($this->cache->getCacheKey('telldusDataListSensors', array(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret)))) !== false)
+    {
+      return $cached;
+    }
     $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
     $params = array(
       'supportedMethods' => constant('TELLDUS_TELLSTICK_TURNON') | constant('TELLDUS_TELLSTICK_TURNON'),
@@ -87,11 +92,16 @@ class telldusdata {
     }
     else
     {
+      $this->cache->setCache($this->cache->getCacheKey('telldusDataListSensors', array(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret)), $body->sensor);
       return $body->sensor;
     }
   }
   
   private function listDevices() {
+    if(($cached = $this->cache->getCache($this->cache->getCacheKey('telldusDataListDevices', array(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret)))) !== false)
+    {
+      return $cached;
+    }
     $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
     $params = array(
       'supportedMethods' => constant('TELLDUS_TELLSTICK_TURNON') | constant('TELLDUS_TELLSTICK_TURNON'),
@@ -108,6 +118,7 @@ class telldusdata {
     }
     else
     {
+      $this->cache->setCache($this->cache->getCacheKey('telldusDataListDevices', array(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret)), $body->device);
       return $body->device;
     } 
   }

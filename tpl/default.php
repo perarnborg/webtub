@@ -14,7 +14,7 @@
   </div>
 <?php endif; ?>
   <div>
-  Last checked <span class="js-last-checked <?php if($account->telldusData->data['tubLastCheckedRecently']): ?>off<?php endif; ?>"><?php echo date('H:i', $account->telldusData->data['tubLastChecked']); ?></span>
+  Last checked <span class="js-last-checked <?php if(!$account->telldusData->data['tubLastCheckedRecently']): ?>off<?php endif; ?>"><?php echo date('H:i', $account->telldusData->data['tubLastChecked']); ?></span>
   </div>
 </div>
 <?php endif; ?>
@@ -36,5 +36,6 @@
     <label for="js-temp">Temp (&deg;C): </label> <input type="text" id="js-temp" name="temp" maxlength="5" value="<?php echo $account->tubTime ? $account->tubTime['temp'] : $account->settings['defaultTemp']['value']; ?>" />
   </div>
   <input type="submit" value="OK" />
+  <?php if(false && $account->tubTime): ?><input type="button" value="Delete time" /> <?php endif; ?>
 </form>
 <?php endif; ?>
