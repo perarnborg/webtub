@@ -12,12 +12,14 @@ class cron
   
   public function checkTubs() {
     // Check activated tubs
-    logger::log("Check for tubs with cron", DEBUG);
+    logger::log("Check for tubs with cron", ALL);
     $activeTubTimes = $this->listActiveTubTimes();
     foreach($activeTubTimes as $activeTubTime)
     {
+      logger::log("Active tubtime", DEBUG);
       $token = $tokenSecret = $settings = null;
       if($this->validateTubTime($activeTubTime, $token, $tokenSecret, $settings)) {
+        logger::log("Valid tubtime", DEBUG);
         $this->telldusData->setTokens($token, $tokenSecret);
         // Check if tub should be turned off
         try
@@ -26,6 +28,7 @@ class cron
           $currentTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
           $coolingPerHour = 0.5;
           $hoursLeft = ($activeTubTime['time'] - time()) / 3600;
+          logger::log("Hours left: " . $hoursLeft . ". Current temp: " . $currentTemp . ". Wanted temp: " . $activeTubTime['temp'], DEBUG);
           if($currentTemp - ($coolingPerHour * $hoursLeft) > $activeTubTime['temp'])
           {
             $tubShouldBeTurnedOff = true;
@@ -51,8 +54,10 @@ class cron
     $futureInactiveTubTimes = $this->listFutureInactiveTubTimes();
     foreach($futureInactiveTubTimes as $futureInactiveTubTime)
     {
+      logger::log("Inactive tubtime", DEBUG);
       $token = $tokenSecret = $settings = null;
       if($this->validateTubTime($futureInactiveTubTime, $token, $tokenSecret, $settings)) {
+        logger::log("Valid tubtime", DEBUG);
         $this->telldusData->setTokens($token, $tokenSecret);
         // Check if tub should be turned on
         try
@@ -62,6 +67,8 @@ class cron
           $coolingPerHour = 0.5;
           $warmingPerHour = 2.5;
           $hoursLeft = ($futureInactiveTubTime['time'] - time()) / 3600;
+          logger::log("Hours left: " . $hoursLeft . ". Current temp: " . $currentTemp . ". Wanted temp: " . $futureInactiveTubTime['temp'], DEBUG);
+          logger::log("If now: " . ($currentTemp + ($warmingPerHour * ($hoursLeft - 0.5)) - ($coolingPerHour * 0.5)), DEBUG);
           if($currentTemp + ($warmingPerHour * ($hoursLeft + 1)) - ($coolingPerHour * 1) < $futureInactiveTubTime['temp'])
           {
             $tubShouldBeTurnedOn = true;

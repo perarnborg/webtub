@@ -15,7 +15,7 @@ class dbCache extends aCache
       $this->dbConn = new dbMgr();
     }
     catch( dbException $e ) {
-      logger::log('couldnt connect to db disabling cache!', DEBUG);
+      logger::log('couldnt connect to db disabling cache!', ALL);
       $this->isEnabled = false;
     }
   }
@@ -35,7 +35,7 @@ class dbCache extends aCache
       throw new Exception('Cant select cache from db');
     }
     $row = $this->dbConn->getRow();
-    logger::log($row!==false ? 'Cache found' : 'Cache not found', DEBUG);
+    logger::log($row!==false ? 'Cache found' : 'Cache not found', ALL);
     return $row===false?false:$row['data'];
   }
   

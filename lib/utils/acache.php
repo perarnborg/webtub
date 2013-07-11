@@ -13,7 +13,7 @@ abstract class aCache {
   public function getCacheKey($source, $keys) 
   {
     $key = $source . '_' . (is_array($keys) ? implode('_', $keys) : $keys);
-    logger::log('Getting key: '.$key, DEBUG);
+    logger::log('Getting key: '.$key, ALL);
     return md5($key);
   }
 }

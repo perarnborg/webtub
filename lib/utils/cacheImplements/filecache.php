@@ -16,7 +16,7 @@ class fileCache extends aCache
     {
       if(!mkdir(config::cacheDir()))
       {
-        logger::log('Can\'t create cache dir: disable cache.', DEBUG);
+        logger::log('Can\'t create cache dir: disable cache.', ALL);
         $this->isEnabled = false;
       }
     }
@@ -29,7 +29,7 @@ class fileCache extends aCache
     {
       return false;
     }
-    logger::log('Get cache: ' . $key, DEBUG);
+    logger::log('Get cache: ' . $key, ALL);
     $isFound = false;
     $value = false;
     $cachefile = config::cacheDir().'/._' . $key;
@@ -43,7 +43,7 @@ class fileCache extends aCache
       $isFound = true;
       fclose($fh);
     }
-    logger::log($isFound ? 'Cache found' : 'Cache not found', DEBUG);
+    logger::log($isFound ? 'Cache found' : 'Cache not found', ALL);
     
     return $value;
   }
