@@ -56,12 +56,19 @@ else
           $pageExists = true;
           break;
         case 'tubtime':
-          $time = strtotime($_POST['date'] . ' ' . $_POST['time']);
-          $temp =  floatval(str_replace(',','.',$_POST['temp']));
-          if($time && $temp) {
-            $account->updateOrCreateTubTime($time, $temp);            
-            header('Location: /');
-            $pageExists = true;
+          if(isset($_POST['delete']))
+          {
+            $account->deleteTubTime();
+          } 
+          else 
+          {
+            $time = strtotime($_POST['date'] . ' ' . $_POST['time']);
+            $temp =  floatval(str_replace(',','.',$_POST['temp']));
+            if($time && $temp) {
+              $account->updateOrCreateTubTime($time, $temp);            
+              header('Location: /');
+              $pageExists = true;
+            }
           }
           break;
       }

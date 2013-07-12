@@ -27,8 +27,8 @@ class cron
           $tubShouldBeTurnedOff = null;
           $currentTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
           $coolingPerHour = 0.5;
-          $hoursLeft = ($activeTubTime['time'] - time()) / 3600;
-          logger::log("Hours left: " . $hoursLeft . ". Current temp: " . $currentTemp . ". Wanted temp: " . $activeTubTime['temp'], DEBUG);
+          $hoursLeft = ($activeTubTime['time'] - time()) / 3600;          
+          logger::log("Hours left: " . $hoursLeft . ". Current temp: " . $currentTemp . ". Wanted temp: " . $activeTubTime['temp'], DEBUG);          
           if($currentTemp - ($coolingPerHour * $hoursLeft) > $activeTubTime['temp'])
           {
             $tubShouldBeTurnedOff = true;
@@ -65,10 +65,10 @@ class cron
           $tubShouldBeTurnedOn = null;
           $currentTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
           $coolingPerHour = 0.5;
-          $warmingPerHour = 2.5;
+          $warmingPerHour = 2.2;
           $hoursLeft = ($futureInactiveTubTime['time'] - time()) / 3600;
-          logger::log("Hours left: " . $hoursLeft . ". Current temp: " . $currentTemp . ". Wanted temp: " . $futureInactiveTubTime['temp'], DEBUG);
-          logger::log("If now: " . ($currentTemp + ($warmingPerHour * ($hoursLeft - 0.5)) - ($coolingPerHour * 0.5)), DEBUG);
+          logger::log("Hours left: " . $hoursLeft . ". Current temp: " . $currentTemp . ". Wanted time: " . date('Ymd H:i', $futureInactiveTubTime['time']) . ". Wanted temp: " . $futureInactiveTubTime['temp'], DEBUG);
+          logger::log("If now: " . ($currentTemp + ($warmingPerHour * ($hoursLeft + 1)) - ($coolingPerHour * 1)), DEBUG);
           if($currentTemp + ($warmingPerHour * ($hoursLeft + 1)) - ($coolingPerHour * 1) < $futureInactiveTubTime['temp'])
           {
             $tubShouldBeTurnedOn = true;

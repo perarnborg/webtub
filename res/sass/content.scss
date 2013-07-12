@@ -67,6 +67,7 @@ header.global {
 }
 .tub-time {
   padding-bottom: 20px;
+  position: relative;
   label {
     display: inline-block;
     margin-bottom: 15px;
@@ -74,6 +75,14 @@ header.global {
   }
   input[type=submit] {
     margin: 10px 0 0 216px;
+    &[name=delete] {
+      position: absolute;
+      bottom: 20px;
+      margin: 0;
+      left: 40px;      
+    }
+  }
+  input[type=button] {
   }
 }
 

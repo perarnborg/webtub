@@ -20,7 +20,7 @@ switch($parameters[0])
     $account->initTelldusData();
     $current = array(
       'tubTemp' => isset($account->telldusData->data['tubTemp']) ? $account->telldusData->data['tubTemp'] : false,
-      'tubStateOn' => isset($account->telldusData->data['tubStateOn']) ? $account->telldusData->data['tubStateOn'] : null,
+      'tubStateOn' => false,// isset($account->telldusData->data['tubStateOn']) ? $account->telldusData->data['tubStateOn'] : null,
       'airTemp' => isset($account->telldusData->data['airTemp']) ? $account->telldusData->data['airTemp'] : false,
       'lastChecked' => date("H:i", $account->telldusData->data['tubLastChecked']),
       'lastCheckedRecently' => $account->telldusData->data['tubLastCheckedRecently'],

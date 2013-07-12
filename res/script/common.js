@@ -12,6 +12,12 @@ $(document).ready(function(){
           if(data && data.tubTemp) {
             $(".js-tub-temp").html(data.tubTemp);
             $(".js-last-checked").html(data.lastChecked);
+            $(".js-tub-state").html(data.tubStateOn ? "on" : "off");
+            if(data.tubStateOn) {
+              $(".js-tub-state").removeClass("off").addClass("on");
+            } else {
+              $(".js-tub-state").addClass("off").removeClass("on");
+            }
             if(data.lastCheckedRecently) {
               $(".js-last-checked").removeClass("off");              
             } else {
@@ -76,6 +82,18 @@ function validateTubTime() {
     $("#js-temp").removeClass("invalid");
   }
   return dateOk && timeOk && tempOk;
+}
+function deleteTubTime() {
+  var url = '/ajax/deletetubtime';
+  jQuery.ajax({
+    type: 'get',
+    url: url,
+    timeout: 5000,
+    dataType: 'json',
+    success: function (data, textStatus, XMLHttpRequest) {
+    
+    }
+  });
 }
 function formatDate(date) {
   if(date != "Invalid Date" && typeof(date) == "object" && typeof(date.getFullYear) == "function") {

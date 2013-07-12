@@ -247,5 +247,35 @@ class account {
     }
     return false;
   }
+    
+  // Update or create tub time in db
+  public function deleteTubTime() 
+  {
+    try 
+    {
+      if($existing = $this->getTubTime())
+      {
+        if($existing['activated'] && !$existing['deactivated'])
+        {
+          if(!$this->telldusData)
+          {
+            $this->initTelldusData();
+          }
+          $this->telldusData->turnOffDevice($this->settings['tubDeviceId']);
+        }
+        $db = new dbMgr();
+        $sql = 'DELETE FROM `tubTimes` 
+         WHERE id = ?';
+        $db->query($sql, 'i', $existing['id']);
+      }
+    }
+    catch (Exception $ex) 
+    {
+      $errorMessage = $ex->getMessage();  
+      var_dump($errorMessage);
+      die();
+    }
+    return false;
+  }
 }
 ?>

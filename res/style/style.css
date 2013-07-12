@@ -1339,7 +1339,8 @@ input[type=text] {
   input[type=text].invalid {
     border: 1px solid red; }
 
-input[type=submit] {
+input[type=submit],
+input[type=button] {
   height: 40px;
   padding: 0 40px; }
 
@@ -1408,13 +1409,19 @@ header.global {
     margin-top: 10px; }
 
 .tub-time {
-  padding-bottom: 20px; }
+  padding-bottom: 20px;
+  position: relative; }
   .tub-time label {
     display: inline-block;
     margin-bottom: 15px;
     width: 120px; }
   .tub-time input[type=submit] {
     margin: 10px 0 0 216px; }
+    .tub-time input[type=submit][name=delete] {
+      position: absolute;
+      bottom: 20px;
+      margin: 0;
+      left: 40px; }
 
 @media screen and (max-width: 660px) {
   .current {

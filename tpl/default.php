@@ -36,6 +36,6 @@
     <label for="js-temp">Temp (&deg;C): </label> <input type="text" id="js-temp" name="temp" maxlength="5" value="<?php echo $account->tubTime ? $account->tubTime['temp'] : $account->settings['defaultTemp']['value']; ?>" />
   </div>
   <input type="submit" value="OK" />
-  <?php if(false && $account->tubTime): ?><input type="button" value="Delete time" /> <?php endif; ?>
+  <?php if($account->tubTime): ?><input type="submit" name="delete" value="Reset time" /> <?php endif; ?>
 </form>
 <?php endif; ?>
