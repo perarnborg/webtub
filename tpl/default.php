@@ -20,7 +20,7 @@
 <?php endif; ?>
 
 <?php if(!$account->hasMissingRequiredSettings): ?>
-<form class="tub-time" action="/post/tubtime" method="post" onsubmit="return validateTubTime();">
+<form class="tub-time clearfix" action="/post/tubtime" method="post" onsubmit="return validateTubTime();">
   <?php if($account->tubTime) { ?>
     <h2>The tub will be warm at:</h2>
   <?php } else { ?>
