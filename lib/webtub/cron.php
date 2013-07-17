@@ -29,7 +29,7 @@ class cron
           $coolingPerHour = 0.5;
           $hoursLeft = ($activeTubTime['time'] - time()) / 3600;          
           logger::log("Hours left: " . $hoursLeft . ". Current temp: " . $currentTemp . ". Wanted temp: " . $activeTubTime['temp'], DEBUG);          
-          if($currentTemp - ($coolingPerHour * $hoursLeft) >= $activeTubTime['temp'])
+          if(($currentTemp - ($coolingPerHour * $hoursLeft) >= $activeTubTime['temp']) || ($hoursLeft < 0 && $currentTemp >= $activeTubTime['temp']))
           {
             $tubShouldBeTurnedOff = true;
             $response = $this->telldusData->turnOffDevice($settings['tubDeviceId']);

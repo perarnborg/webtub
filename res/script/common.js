@@ -1,3 +1,6 @@
+if (typeof console == "undefined") {
+  var console = { log: function() {} };  
+}
 $(document).ready(function(){  
   $(".js-toggle-settings").click(function(e) { e.preventDefault(); $(".js-settings").slideToggle(100); });
   if($(".js-tub-temp").length > 0) {
@@ -10,6 +13,7 @@ $(document).ready(function(){
       	dataType: 'json',
         success: function (data, textStatus, XMLHttpRequest) {
           if(data && data.tubTemp) {
+            console.log(data);
             $(".js-tub-temp").html(data.tubTemp);
             $(".js-last-checked").html(data.lastChecked);
             $(".js-tub-state").html(data.tubStateOn ? "on" : "off");
