@@ -3,18 +3,12 @@
 -- http://www.phpmyadmin.net
 --
 -- Värd: localhost
--- Skapad: 27 jun 2013 kl 13:25
+-- Skapad: 08 sep 2013 kl 20:02
 -- Serverversion: 5.5.29
 -- PHP-version: 5.4.10
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
 
 --
 -- Databas: `webtub`
@@ -39,6 +33,9 @@ CREATE TABLE `accounts` (
 -- Dumpning av Data i tabell `accounts`
 --
 
+INSERT INTO `accounts` (`id`, `email`, `fullName`, `accessToken`, `accessTokenSecret`) VALUES
+(1, 'stefan@nada.kth.se', 'Stefan Arnborg', '0232e4910e5ecf0674503e3ea2ba9953051dd6d1d', '55f90368edd81da6676c63ffa962ab0e');
+
 -- --------------------------------------------------------
 
 --
@@ -51,7 +48,17 @@ CREATE TABLE `tubAccountSettings` (
   `settingKey` varchar(100) NOT NULL,
   `value` varchar(252) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+
+--
+-- Dumpning av Data i tabell `tubAccountSettings`
+--
+
+INSERT INTO `tubAccountSettings` (`id`, `email`, `settingKey`, `value`) VALUES
+(1, 'stefan@nada.kth.se', 'defaultTemp', '38,5'),
+(2, 'stefan@nada.kth.se', 'tubDeviceId', '165127'),
+(3, 'stefan@nada.kth.se', 'airSensorId', '771199'),
+(4, 'stefan@nada.kth.se', 'tubSensorId', '948635');
 
 -- --------------------------------------------------------
 
@@ -73,10 +80,10 @@ CREATE TABLE `tubSettings` (
 --
 
 INSERT INTO `tubSettings` (`id`, `key`, `name`, `sourceEndpoint`, `required`) VALUES
-(1, 'tubSensorId', 'Sensor for the tub', NULL, 1),
-(2, 'tubDeviceId', 'Device for the tub', NULL, 1),
-(3, 'airSensorId', 'Sensor for air temperature', NULL, 0),
-(4, 'defaultTemp', 'Default bath temperature', NULL, 1);
+(1, 'tubSensorId', 'Sensor for the tub', 'sensors', 1),
+(2, 'tubDeviceId', 'Device for the tub', 'devices', 1),
+(3, 'airSensorId', 'Sensor for air temperature', 'sensors', 0),
+(4, 'defaultTemp', 'Default bath temperature (&deg;C)', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -88,13 +95,9 @@ CREATE TABLE `tubTimes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(252) NOT NULL,
   `time` int(11) NOT NULL,
-  `temp` int(11) NOT NULL,
+  `temp` float NOT NULL,
   `activated` tinyint(4) NOT NULL DEFAULT '0',
   `deactivated` tinyint(4) NOT NULL DEFAULT '0',
   `created` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
