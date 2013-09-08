@@ -18,13 +18,17 @@ h2 {
   display: none;
 }
 .borderbox { @include border-box(); }
-input[type=text] {
-  height: 34px;
+input[type=text],
+input[type=datetime],
+input[type=datetime-local] {
   width: 200px;
-  @extend .borderbox;
   &.invalid {
     border: 1px solid red;
   }
+}
+input[type=text] {
+  height: 34px;
+  @extend .borderbox;
 }
 input[type=submit],
 input[type=button] {

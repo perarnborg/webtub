@@ -2,6 +2,11 @@ if (typeof console == "undefined") {
   var console = { log: function() {} };  
 }
 $(document).ready(function(){  
+  if(Modernizr.inputtypes["datetime-local"]) {
+    $("html").addClass("datetime-local");
+  } else {
+    $("html").addClass("no-datetime-local");    
+  }
   $(".js-toggle-settings").click(function(e) { e.preventDefault(); $(".js-settings").slideToggle(100); });
   if($(".js-tub-temp").length > 0) {
     setInterval(function(){
@@ -49,18 +54,31 @@ function validateTubTime() {
   var dateOk = false;
   var timeOk = false;
   var tempOk = false;
-  if($("#js-date").val().length > 0) {
-    var date = formatDate(new Date($("#js-date").val()));
-    var today = formatDate(new Date());
-    if(date && date >= today) {
-      dateOk = true;
+  if($("html").hasClass("touch")) {
+    if($("#js-datetime").val().length > 0) {
+      var datetime = new Date($("#js-datetime").val());
+      var today = new Date();
+      if(datetime && datetime >= today) {
+        dateOk = true;
+        timeOk = true;
+      }
+    }    
+    $("#js-date").val('');
+    $("#js-time").val('');
+  } else {
+    if($("#js-date").val().length > 0) {
+      var date = formatDate(new Date($("#js-date").val()));
+      var today = formatDate(new Date());
+      if(date && date >= today) {
+        dateOk = true;
+      }
     }
-  }
-  if($("#js-time").val().length > 0) {
-    var time = $("#js-time").val().replace(":", '');    
-    if(time.match(/^\d{1,2}\d{2}$/)) {
-      $("#js-time").val(time);
-      timeOk = true;
+    if($("#js-time").val().length > 0) {
+      var time = $("#js-time").val().replace(":", '');    
+      if(time.match(/^\d{1,2}\d{2}$/)) {
+        $("#js-time").val(time);
+        timeOk = true;
+      }
     }
   }
   if($("#js-temp").val().length > 0) {
@@ -71,9 +89,9 @@ function validateTubTime() {
     }
   }
   if(!dateOk) {
-    $("#js-date").addClass("invalid");
+    $("#js-date, #js-datetime").addClass("invalid");
   } else {
-    $("#js-date").removeClass("invalid");
+    $("#js-date, #js-datetime").removeClass("invalid");
   }
   if(!timeOk) {
     $("#js-time").addClass("invalid");

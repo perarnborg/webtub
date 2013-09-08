@@ -1,5 +1,5 @@
 @CHARSET "UTF-8";
-/* normalize.css 2012-01-22T23:30 UTC - http://github.com/necolas/normalize.css */
+/*! normalize.css 2012-01-22T23:30 UTC - http://github.com/necolas/normalize.css */
 /* =============================================================================
    HTML5 display definitions
    ========================================================================== */
@@ -138,7 +138,7 @@ code,
 kbd,
 samp {
   font-family: monospace, serif;
-  _font-family: "courier new", monospace;
+  _font-family: 'courier new', monospace;
   font-size: 1em; }
 
 /*
@@ -241,7 +241,7 @@ form {
  * Define consistent border, margin, and padding
  */
 fieldset {
-  border: 1px solid silver;
+  border: 1px solid #c0c0c0;
   margin: 0 2px;
   padding: 0.35em 0.625em 0.75em; }
 
@@ -418,7 +418,7 @@ nav ul li {
 .warning {
   color: red; }
 
-/* jQuery UI - v1.10.3 - 2013-07-05
+/*! jQuery UI - v1.10.3 - 2013-07-05
 * http://jqueryui.com
 * Includes: jquery.ui.core.css, jquery.ui.datepicker.css
 * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Trebuchet%20MS%2CTahoma%2CVerdana%2CArial%2Csans-serif&fwDefault=bold&fsDefault=1.1em&cornerRadius=4px&bgColorHeader=f6a828&bgTextureHeader=gloss_wave&bgImgOpacityHeader=35&borderColorHeader=e78f08&fcHeader=ffffff&iconColorHeader=ffffff&bgColorContent=eeeeee&bgTextureContent=highlight_soft&bgImgOpacityContent=100&borderColorContent=dddddd&fcContent=333333&iconColorContent=222222&bgColorDefault=f6f6f6&bgTextureDefault=glass&bgImgOpacityDefault=100&borderColorDefault=cccccc&fcDefault=1c94c4&iconColorDefault=ef8c08&bgColorHover=fdf5ce&bgTextureHover=glass&bgImgOpacityHover=100&borderColorHover=fbcb09&fcHover=c77405&iconColorHover=ef8c08&bgColorActive=ffffff&bgTextureActive=glass&bgImgOpacityActive=65&borderColorActive=fbd850&fcActive=eb8f00&iconColorActive=ef8c08&bgColorHighlight=ffe45c&bgTextureHighlight=highlight_soft&bgImgOpacityHighlight=75&borderColorHighlight=fed22f&fcHighlight=363636&iconColorHighlight=228ef1&bgColorError=b81900&bgTextureError=diagonals_thick&bgImgOpacityError=18&borderColorError=cd0a0a&fcError=ffffff&iconColorError=ffd27a&bgColorOverlay=666666&bgTextureOverlay=diagonals_thick&bgImgOpacityOverlay=20&opacityOverlay=50&bgColorShadow=000000&bgTextureShadow=flat&bgImgOpacityShadow=10&opacityShadow=20&thicknessShadow=5px&offsetTopShadow=-5px&offsetLeftShadow=-5px&cornerRadiusShadow=5px
@@ -470,7 +470,7 @@ nav ul li {
   z-index: 100; }
 
 .ui-state-disabled {
-  cursor: default!important; }
+  cursor: default !important; }
 
 .ui-icon {
   display: block;
@@ -487,12 +487,12 @@ nav ul li {
 
 .ui-datepicker {
   width: 17em;
-  padding: 0.2em 0.2em 0;
+  padding: .2em .2em 0;
   display: none; }
 
 .ui-datepicker .ui-datepicker-header {
   position: relative;
-  padding: 0.2em 0; }
+  padding: .2em 0; }
 
 .ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next {
   position: absolute;
@@ -542,10 +542,10 @@ nav ul li {
   width: 100%;
   font-size: .9em;
   border-collapse: collapse;
-  margin: 0 0 0.4em; }
+  margin: 0 0 .4em; }
 
 .ui-datepicker th {
-  padding: 0.7em 0.3em;
+  padding: .7em .3em;
   text-align: center;
   font-weight: 700;
   border: 0; }
@@ -562,17 +562,17 @@ nav ul li {
 
 .ui-datepicker .ui-datepicker-buttonpane {
   background-image: none;
-  margin: 0.7em 0 0;
-  padding: 0 0.2em;
+  margin: .7em 0 0;
+  padding: 0 .2em;
   border-left: 0;
   border-right: 0;
   border-bottom: 0; }
 
 .ui-datepicker .ui-datepicker-buttonpane button {
   float: right;
-  margin: 0.5em 0.2em 0.4em;
+  margin: .5em .2em .4em;
   cursor: pointer;
-  padding: 0.2em 0.6em 0.3em;
+  padding: .2em .6em .3em;
   width: auto;
   overflow: visible; }
 
@@ -587,7 +587,7 @@ nav ul li {
 
 .ui-datepicker-multi .ui-datepicker-group table {
   width: 95%;
-  margin: 0 auto 0.4em; }
+  margin: 0 auto .4em; }
 
 .ui-datepicker-multi-2 .ui-datepicker-group {
   width: 50%; }
@@ -642,18 +642,18 @@ nav ul li {
   border-left-width: 1px; }
 
 .ui-widget {
-  font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
+  font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif;
   font-size: 1.1em; }
 
 .ui-widget .ui-widget {
   font-size: 1em; }
 
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
-  font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
+  font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif;
   font-size: 1em; }
 
 .ui-widget-content {
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   background: #eeeeee url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) 50% top repeat-x;
   color: #333; }
 
@@ -670,7 +670,7 @@ nav ul li {
   color: #fff; }
 
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   background: #f6f6f6 url(images/ui-bg_glass_100_f6f6f6_1x400.png) 50% 50% repeat-x;
   font-weight: bold;
   color: #1c94c4; }
@@ -1333,11 +1333,17 @@ h2 {
   -webkit-box-sizing: border-box;
   box-sizing: border-box; }
 
-input[type=text] {
-  height: 34px;
+input[type=text],
+input[type=datetime],
+input[type=datetime-local] {
   width: 200px; }
-  input[type=text].invalid {
+  input[type=text].invalid,
+  input[type=datetime].invalid,
+  input[type=datetime-local].invalid {
     border: 1px solid red; }
+
+input[type=text] {
+  height: 34px; }
 
 input[type=submit],
 input[type=button] {
@@ -1400,7 +1406,7 @@ header.global {
   font-weight: bold; }
 
 .current {
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   border-radius: 5px;
   float: right;
   padding: 20px;
@@ -1415,6 +1421,13 @@ header.global {
     display: inline-block;
     margin-bottom: 15px;
     width: 120px; }
+  .touch .tub-time .date, .touch
+  .tub-time .time {
+    display: none; }
+  .tub-time .datetime {
+    display: none; }
+    .touch .tub-time .datetime {
+      display: block; }
   .tub-time input[type=submit] {
     margin: 10px 0 0 216px; }
     .tub-time input[type=submit][name=delete] {
@@ -1437,7 +1450,9 @@ header.global {
     margin-bottom: 5px;
     margin-top: 15px;
     width: auto; }
-  .tub-time input[type=text] {
+  .tub-time input[type=text],
+  .tub-time input[type=datetime],
+  .tub-time input[type=datetime-local] {
     width: 100%; }
   .tub-time input[type=submit] {
     float: right;

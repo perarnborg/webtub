@@ -73,6 +73,18 @@ header.global {
     margin-bottom: 15px;
     width: 120px;
   }
+  .date,
+  .time {
+    .touch & {
+      display: none;
+    }
+  }
+  .datetime {
+    display: none;
+    .touch & {
+      display: block;
+    }
+  }
   input[type=submit] {
     margin: 10px 0 0 216px;
     &[name=delete] {
@@ -105,7 +117,9 @@ header.global {
       margin-top: 15px;
       width: auto;
     }
-    input[type=text] {
+    input[type=text],
+    input[type=datetime],
+    input[type=datetime-local] {
       width: 100%;
     }
     input[type=submit] {

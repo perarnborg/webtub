@@ -61,8 +61,13 @@ else
             $account->deleteTubTime();
           } 
           else 
-          {
-            $time = strtotime($_POST['date'] . ' ' . $_POST['time']);
+          { 
+            $time = 0;
+            if($_POST['date'] && $_POST['time']) {
+              $time = strtotime($_POST['date'] . ' ' . $_POST['time']);
+            } else if($_POST['datetime']){
+              $time = strtotime(str_replace('T', ' ', $_POST['datetime']));
+            }
             $temp =  floatval(str_replace(',','.',$_POST['temp']));
             if($time && $temp) {
               $account->updateOrCreateTubTime($time, $temp);            
