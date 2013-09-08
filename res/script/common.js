@@ -83,7 +83,7 @@ function validateTubTime() {
   }
   if($("#js-temp").val().length > 0) {
     var temp = parseFloat($("#js-temp").val().replace(",", "."));    
-    if(temp > 5 && temp < 50) {
+    if(temp > 5 && temp < 42) {
       $("#js-temp").val(temp);
       tempOk = true;
     }
