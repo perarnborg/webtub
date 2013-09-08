@@ -1420,6 +1420,8 @@ header.global {
     font-weight: bold;
     margin-left: 5px;
     text-transform: uppercase; }
+    .current .change.pending {
+      opacity: 0.5; }
 
 .tub-time {
   padding-bottom: 20px;

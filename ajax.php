@@ -27,5 +27,19 @@ switch($parameters[0])
     );
     echo json_encode($current);
     break;
+  case 'turn-on':
+    $account->initTelldusData();
+    $account->initTelldusData();
+    $deviceId = $account->settings['tubDeviceId']['value'];
+    $account->telldusData->turnOnDevice($deviceId);
+    echo json_encode(true);
+    break;
+  case 'turn-off':
+    $account->initTelldusData();
+    $account->initTelldusData();
+    $deviceId = $account->settings['tubDeviceId']['value'];
+    $account->telldusData->turnOffDevice($deviceId);
+    echo json_encode(true);
+    break;
 }
 ?>

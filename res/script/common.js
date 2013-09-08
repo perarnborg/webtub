@@ -8,6 +8,7 @@ $(document).ready(function(){
     $("html").addClass("no-datetime-local");    
   }
   $(".js-toggle-settings").click(function(e) { e.preventDefault(); $(".js-settings").slideToggle(100); });
+  $(".js-change").click(function(e) { e.preventDefault(); changeTubState(this); });
   if($(".js-tub-temp").length > 0) {
     setInterval(function(){
       var url = '/ajax/current';
@@ -18,7 +19,6 @@ $(document).ready(function(){
       	dataType: 'json',
         success: function (data, textStatus, XMLHttpRequest) {
           if(data && data.tubTemp) {
-            console.log(data);
             $(".js-tub-temp").html(data.tubTemp);
             $(".js-last-checked").html(data.lastChecked);
             $(".js-tub-state").html(data.tubStateOn ? "on" : "off");
@@ -50,6 +50,35 @@ $(document).ready(function(){
     $("#js-date").datepicker({minDate: new Date(), dateFormat: "yy-mm-dd"});
   }
 });
+function changeTubState(sender) {
+  var turnOn = $(sender).data('turn') == 'on';
+  var url = '/ajax/turn-' + (turnOn ? 'on' : 'off');
+  $(sender).addClass("pending");
+  jQuery.ajax({
+		type: 'get',		
+		url: url,
+  	timeout: 10000,
+  	dataType: 'json',
+    success: function (data, textStatus, XMLHttpRequest) {
+      if(data) {
+        $(".js-tub-state").html((turnOn ? 'on' : 'off'));
+        $(".js-tub-state").addClass((turnOn ? 'on' : 'off'));
+        $(".js-tub-state").removeClass((turnOn ? 'off' : 'on'));
+        $(".js-change").html("Turn " + (turnOn ? 'off' : 'on'));
+        $(".js-change").attr("href", "/turn-" + (turnOn ? 'off' : 'on'));
+        $(".js-change").data("turn", (turnOn ? 'off' : 'on'));
+        var updated = new Date();
+        $(".js-last-checked").html(updated.getHours() + ':' + updated.getMinutes());
+      }
+    },
+    complete: function(jqXHR, textStatus) {
+      $(sender).removeClass("pending");
+    },
+    error: function(jqXHR, textStatus) {
+      alert("Could not process your request.");
+    }
+  });
+}
 function validateTubTime() {
   var dateOk = false;
   var timeOk = false;
@@ -83,7 +112,7 @@ function validateTubTime() {
   }
   if($("#js-temp").val().length > 0) {
     var temp = parseFloat($("#js-temp").val().replace(",", "."));    
-    if(temp > 5 && temp < 42) {
+    if(temp > 5 && temp <= 40) {
       $("#js-temp").val(temp);
       tempOk = true;
     }

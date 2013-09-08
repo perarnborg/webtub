@@ -69,6 +69,9 @@ else
               $time = strtotime(str_replace('T', ' ', $_POST['datetime']));
             }
             $temp =  floatval(str_replace(',','.',$_POST['temp']));
+            if($temp <= 20 || $temp > 40) {
+              $temp = false;
+            }
             if($time && $temp) {
               $account->updateOrCreateTubTime($time, $temp);            
               header('Location: /');
@@ -80,12 +83,14 @@ else
           $account->initTelldusData();
           $deviceId = $account->settings['tubDeviceId']['value'];
           $account->telldusData->turnOnDevice($deviceId);
+          header('Location: /');
           $pageExists = true;
           break;
         case 'turn-off':
           $account->initTelldusData();
           $deviceId = $account->settings['tubDeviceId']['value'];
           $account->telldusData->turnOffDevice($deviceId);
+          header('Location: /');
           $pageExists = true;
           break;
       }

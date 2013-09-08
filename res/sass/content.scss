@@ -71,6 +71,9 @@ header.global {
     font-weight: bold;
     margin-left: 5px;
     text-transform: uppercase;
+    &.pending {
+      opacity: 0.5;
+    }
   }
 }
 .tub-time {
