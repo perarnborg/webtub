@@ -10,7 +10,7 @@
 <?php endif; ?>
 <?php if(!is_null($account->telldusData->data['tubStateOn'])): ?>
   <div>
-  The tub is turned <span class="js-tub-state <?php echo $account->telldusData->data['tubStateOn'] ? "on" : "off" ?>"><?php echo $account->telldusData->data['tubStateOn'] ? "on" : "off" ?></span>
+  The tub is turned <span class="js-tub-state <?php echo $account->telldusData->data['tubStateOn'] ? "on" : "off" ?>"><?php echo $account->telldusData->data['tubStateOn'] ? "on" : "off" ?></span> <a href="/post/turn-<?php echo $account->telldusData->data['tubStateOn'] ? "off" : "on" ?>" class="change js-change">Turn <?php echo $account->telldusData->data['tubStateOn'] ? "off" : "on" ?></a>
   </div>
 <?php endif; ?>
   <div>

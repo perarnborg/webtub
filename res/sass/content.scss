@@ -60,14 +60,23 @@ header.global {
   border-radius: 5px;
   float: right;
   padding: 20px;
+  position: relative;
   width: 200px;
+  z-index: 2;
   div+div {
     margin-top: 10px;
+  }
+  .change {
+    font-size: 0.5em;
+    font-weight: bold;
+    margin-left: 5px;
+    text-transform: uppercase;
   }
 }
 .tub-time {
   padding-bottom: 20px;
   position: relative;
+  z-index: 1;
   label {
     display: inline-block;
     margin-bottom: 15px;

@@ -76,6 +76,18 @@ else
             }
           }
           break;
+        case 'turn-on':
+          $account->initTelldusData();
+          $deviceId = $account->settings['tubDeviceId']['value'];
+          $account->telldusData->turnOnDevice($deviceId);
+          $pageExists = true;
+          break;
+        case 'turn-off':
+          $account->initTelldusData();
+          $deviceId = $account->settings['tubDeviceId']['value'];
+          $account->telldusData->turnOffDevice($deviceId);
+          $pageExists = true;
+          break;
       }
       if($pageExists)
       {

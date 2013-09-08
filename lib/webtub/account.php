@@ -261,7 +261,7 @@ class account {
           {
             $this->initTelldusData();
           }
-          $this->telldusData->turnOffDevice($this->settings['tubDeviceId']);
+          $this->telldusData->turnOffDevice($this->settings['tubDeviceId']['value']);
         }
         $db = new dbMgr();
         $sql = 'DELETE FROM `tubTimes` 

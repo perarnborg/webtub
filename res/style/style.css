@@ -1410,13 +1410,21 @@ header.global {
   border-radius: 5px;
   float: right;
   padding: 20px;
-  width: 200px; }
+  position: relative;
+  width: 200px;
+  z-index: 2; }
   .current div + div {
     margin-top: 10px; }
+  .current .change {
+    font-size: 0.5em;
+    font-weight: bold;
+    margin-left: 5px;
+    text-transform: uppercase; }
 
 .tub-time {
   padding-bottom: 20px;
-  position: relative; }
+  position: relative;
+  z-index: 1; }
   .tub-time label {
     display: inline-block;
     margin-bottom: 15px;
