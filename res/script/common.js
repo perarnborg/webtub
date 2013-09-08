@@ -105,18 +105,6 @@ function validateTubTime() {
   }
   return dateOk && timeOk && tempOk;
 }
-function deleteTubTime() {
-  var url = '/ajax/deletetubtime';
-  jQuery.ajax({
-    type: 'get',
-    url: url,
-    timeout: 5000,
-    dataType: 'json',
-    success: function (data, textStatus, XMLHttpRequest) {
-    
-    }
-  });
-}
 function formatDate(date) {
   if(date != "Invalid Date" && typeof(date) == "object" && typeof(date.getFullYear) == "function") {
     return '' + date.getFullYear() + '-' + (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1) + '-' + (date.getDate() < 10 ? '0' : '') + date.getDate();    
