@@ -15,7 +15,7 @@ class cron
 
   public function checkTubs() {
     // Check activated tubs
-    logger::log("Check for tubs with cron", ALL);
+    logger::log("Check for tubs with cron", DEBUG);
     $activeTubTimes = $this->listActiveTubTimes();
     foreach($activeTubTimes as $activeTubTime)
     {
