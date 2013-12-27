@@ -84,24 +84,16 @@ class cron
       }
     }
   }
-/*
+
   private function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
-    $coff = ($currentTubTemp - $currentAirTemp) / exp()
-
-
-
-
-
-    $coolingPerHour = 0.5;
-    $warmingPerHour = 2.2;
-    $hoursLeft = ($requestedTime - time()) / 3600;
-    if($hoursLeft <= 0) {
-      return $currentTubTemp < $requestedTemp;
-    } else if($hoursLeft < 1) {
-      return $currentTubTemp - ($coolingPerHour * $hoursLeft) < $requestedTemp;
-    }
-    return ($currentTubTemp + ($warmingPerHour * ($hoursLeft - 1)) - ($coolingPerHour * 1) <= $requestedTemp);
-  }*/
+    $c = 0.0003;
+    $Td = 150;
+    $t = time();
+    $coff = ($currentTubTemp - $currentAirTemp) / exp(-$c * $t);
+    $con = ($requestedTemp - $currentAirTemp - $Td) / exp(-$c * $requestedTime);
+    $x = -1 / $c * log($Td/($coff - $con));
+    return $x < $t;
+  }
 
   private function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
     $coolingPerHour = 0.5;
