@@ -95,7 +95,7 @@ class cron
     return $x < $t;
   }
 
-  private function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
+  private function _deprecated_tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
     $coolingPerHour = 0.5;
     $warmingPerHour = 2.2;
     $hoursLeft = ($requestedTime - time()) / 3600;
