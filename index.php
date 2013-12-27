@@ -8,17 +8,17 @@ $parameter = isset($_GET['p'])?$_GET['p']:'';
 logger::log('Start of request: '.$parameter, ALL);
 
 $account = new account();
-if(!$account->authenticated) 
+if(!$account->authenticated)
 {
   if(!$account->authenticate())
   {
-    includer::includeFiles(array('header.php', 'login.php', 'footer.php'), 
+    includer::includeFiles(array('header.php', 'login.php', 'footer.php'),
       array('account' => $account));
   } else {
     header('Location: /');
   }
 }
-else 
+else
 {
 
   $parameters = explode('/',$parameter);
@@ -26,15 +26,15 @@ else
   switch($parameters[0])
   {
     case '':
-      if($account->initTelldusData()) 
+      if($account->initTelldusData())
       {
-        includer::includeFiles(array('header.php', 'default.php', 'footer.php'), 
+        includer::includeFiles(array('header.php', 'default.php', 'footer.php'),
           array('account' => $account));
       }
       else
       {
         logger::log("Telldus integration error. " . $account->telldusData->errorMessage, ERROR);
-        includer::includeFiles(array('header.php', '500.php', 'footer.php'), 
+        includer::includeFiles(array('header.php', '500.php', 'footer.php'),
           array('httpResponseError' => true));
       }
       break;
@@ -42,8 +42,25 @@ else
       if($account->setAccessTokens()) {
         header('Location: /');
       } else {
-        includer::includeFiles(array('header.php', 'login.php', 'footer.php'), 
-          array('account' => $account));        
+        includer::includeFiles(array('header.php', 'login.php', 'footer.php'),
+          array('account' => $account));
+      }
+      break;
+    case 'test':
+      if($account->initTelldusData()) {
+        $turnOn = null;
+        if($_POST) {
+          require_once config::libDir().'/webtub/cron.php';
+          $time = 0;
+          if($_POST['date'] && $_POST['time']) {
+            $time = strtotime($_POST['date'] . ' ' . $_POST['time']);
+          }
+          $temp =  floatval(str_replace(',','.',$_POST['temp']));
+          $cron = new cron(true);
+          $turnOn = $cron->tubOnOrOff($account->telldusData->data['tubTemp'], $account->telldusData->data['airTemp'], $temp, $time);
+        }
+        includer::includeFiles(array('header.php', 'test.php', 'footer.php'),
+          array('account' => $account, 'turnOn' => $turnOn));
       }
       break;
     case 'post':
@@ -59,9 +76,9 @@ else
           if(isset($_POST['delete']))
           {
             $account->deleteTubTime();
-          } 
-          else 
-          { 
+          }
+          else
+          {
             $time = 0;
             if($_POST['date'] && $_POST['time']) {
               $time = strtotime($_POST['date'] . ' ' . $_POST['time']);
@@ -73,7 +90,7 @@ else
               $temp = false;
             }
             if($time && $temp) {
-              $account->updateOrCreateTubTime($time, $temp);            
+              $account->updateOrCreateTubTime($time, $temp);
               header('Location: /');
               $pageExists = true;
             }
@@ -107,7 +124,7 @@ else
       logger::log('File not found: ' . $_SERVER['REQUEST_URI'], WARNING);
       header("HTTP/1.0 404 Not Found");
       $pageTitle = 'Page not found | ' . webtub::pageTitle;
-      includer::includeFiles(array('header.php','404.php','footer.php'), 
+      includer::includeFiles(array('header.php','404.php','footer.php'),
         array('httpResponseError' => true, 'pageTitle' => $pageTitle));
       break;
   }

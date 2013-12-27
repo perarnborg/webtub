@@ -3,11 +3,13 @@
 class cron
 {
   private $tokens, $settings, $telldusData;
-  public function __construct()
+  public function __construct($testMode = false)
   {
-    $this->settings = $this->listUserSettings();
-    $this->tokens = $this->listUserTokens();
-    $this->telldusData = new telldusData(false);
+    if(!$testMode) {
+      $this->settings = $this->listUserSettings();
+      $this->tokens = $this->listUserTokens();
+      $this->telldusData = new telldusData(false);
+    }
   }
 
   public function checkTubs() {
@@ -85,10 +87,12 @@ class cron
     }
   }
 
-  private function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
+  public function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
     $c = 0.0003;
     $Td = 150;
-    $t = time();
+    $secondsInWeek = 7 * 24 * 60 * 60;
+    $t = $secondsInWeek / 60;
+    $requestedTime = ($requestedTime - time() + $secondsInWeek) / 60;
     $coff = ($currentTubTemp - $currentAirTemp) / exp(-$c * $t);
     $con = ($requestedTemp - $currentAirTemp - $Td) / exp(-$c * $requestedTime);
     $x = -1 / $c * log($Td/($coff - $con));
