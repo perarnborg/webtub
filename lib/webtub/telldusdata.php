@@ -2,16 +2,16 @@
 class telldusdata {
   private $token, $tokenSecret, $cache;
   public $account, $data = array(), $errorMessage;
-  
+
   public function __construct($account)
   {
     $this->cache = config::getCache();
-    if($account) 
+    if($account)
     {
       $this->account = $account;
       $this->token = $this->account->token;
       $this->tokenSecret = $this->account->tokenSecret;
-      if($this->account->authenticated) 
+      if($this->account->authenticated)
       {
         try
         {
@@ -26,7 +26,7 @@ class telldusdata {
           }
           if(isset($this->account->settings['tubDeviceId']) && $this->account->settings['tubDeviceId']['value'])
           {
-            $this->data['tubStateOn'] = $this->getDeviceState($this->account->settings['tubDeviceId']['value']);          
+            $this->data['tubStateOn'] = $this->getDeviceState($this->account->settings['tubDeviceId']['value']);
           }
           if(isset($this->account->settings['airSensorId']) && $this->account->settings['airSensorId']['value'])
           {
@@ -35,33 +35,34 @@ class telldusdata {
         }
         catch(Exception $ex)
         {
+          var_dump($ex);
           $this->errorMessage = $ex->getMessage();
         }
       }
     }
   }
-  
+
   public function setTokens($token, $tokenSecret) {
     $this->token = $token;
     $this->tokenSecret = $tokenSecret;
   }
-  
+
   public function getSensorTemp($id, &$lastChecked = null) {
     $tubSensor = $this->getSensor($id);
     if(isset($tubSensor->data))
     {
       $lastChecked = $tubSensor->lastUpdated;
-      foreach($tubSensor->data as $data) 
+      foreach($tubSensor->data as $data)
       {
         if($data->name == 'temp')
         {
-          return $data->value;              
+          return $data->value;
         }
       }
     }
     return null;
   }
-  
+
   public function getDeviceState($id) {
     $tubDevice = $this->getDevice($id);
     if(isset($tubDevice->state))
@@ -70,7 +71,7 @@ class telldusdata {
     }
     return null;
   }
-  
+
   private function listSensors() {
     if(($cached = $this->cache->getCache($this->cache->getCacheKey('telldusDataListSensors', array(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret)))) !== false)
     {
@@ -96,7 +97,7 @@ class telldusdata {
       return $body->sensor;
     }
   }
-  
+
   private function listDevices() {
     if(($cached = $this->cache->getCache($this->cache->getCacheKey('telldusDataListDevices', array(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret)))) !== false)
     {
@@ -120,44 +121,54 @@ class telldusdata {
     {
       $this->cache->setCache($this->cache->getCacheKey('telldusDataListDevices', array(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret)), $body->device);
       return $body->device;
-    } 
+    }
   }
-  
+
   private function getSensor($id) {
-    $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
-    $params = array(
-      'id' => $id,
-    );
-    $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/sensor/info', $params, 'GET');
-    $body = json_decode($response->getBody());
-    if(isset($body->error) && $body->error)
-    {
-      throw new Exception($body->error);
+    try {
+      $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
+      $params = array(
+        'id' => $id,
+      );
+      $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/sensor/info', $params, 'GET');
+      $body = json_decode($response->getBody());
+      if(isset($body->error) && $body->error)
+      {
+        throw new Exception($body->error);
+      }
+      else
+      {
+        return $body;
+      }
+    } catch (Exception $ex) {
+      logger::log('Could not get sensor with id '.$id, ERROR);
+      return new stdClass();
     }
-    else
-    {
-      return $body;
-    } 
   }
-  
+
   private function getDevice($id) {
-    $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
-    $params = array(
-      'id' => $id,
-      'supportedMethods' => constant('TELLDUS_TELLSTICK_TURNON') | constant('TELLDUS_TELLSTICK_TURNON'),
-    );
-    $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/device/info', $params, 'GET');
-    $body = json_decode($response->getBody());
-    if(isset($body->error) && $body->error)
-    {
-      throw new Exception($body->error);
+    try {
+      $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
+      $params = array(
+        'id' => $id,
+        'supportedMethods' => constant('TELLDUS_TELLSTICK_TURNON') | constant('TELLDUS_TELLSTICK_TURNON'),
+      );
+      $response = $consumer->sendRequest(constant('TELLDUS_REQUEST_URI').'/device/info', $params, 'GET');
+      $body = json_decode($response->getBody());
+      if(isset($body->error) && $body->error)
+      {
+        throw new Exception($body->error);
+      }
+      else
+      {
+        return $body;
+      }
+    } catch (Exception $ex) {
+      logger::log('Could not get device with id '.$id, ERROR);
+      return new stdClass();
     }
-    else
-    {
-      return $body;
-    } 
   }
-  
+
   public function turnOnDevice($id) {
     $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
     $params = array(
@@ -172,9 +183,9 @@ class telldusdata {
     else
     {
       return $body;
-    } 
+    }
   }
-  
+
   public function turnOffDevice($id) {
     $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
     $params = array(
@@ -189,9 +200,9 @@ class telldusdata {
     else
     {
       return $body;
-    } 
+    }
   }
-  
+
   private function getUserProfile() {
     $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $this->token, $this->tokenSecret);
     $params = array(
@@ -204,7 +215,7 @@ class telldusdata {
     else
     {
       return $body;
-    } 
+    }
   }
 }
 ?>

@@ -1,16 +1,16 @@
 <?php
 class account {
   public $authenticated, $email, $fullname, $settings = array(), $telldusData, $hasMissingRequiredSettings = false, $tubTime;
-  
+
   public function __construct()
   {
-    if($this->authenticated = $this->isAuthenticated()) 
+    if($this->authenticated = $this->isAuthenticated())
     {
       $this->email = $_SESSION[webtub::sessionKeyEmail];
-      $this->fullname = $_SESSION[webtub::sessionKeyFullname];      
+      $this->fullname = $_SESSION[webtub::sessionKeyFullname];
       $this->setAccount();
       $this->settings = $this->listSettings();
-      foreach($this->settings as $setting) 
+      foreach($this->settings as $setting)
       {
         if($setting['required'] && !$setting['value']) {
           $this->hasMissingRequiredSettings = true;
@@ -19,10 +19,10 @@ class account {
       $this->tubTime = $this->getTubTime();
     }
   }
-  
+
   public function logout()
   {
-    if($this->authenticated = $this->isAuthenticated()) 
+    if($this->authenticated = $this->isAuthenticated())
     {
       unset($_SESSION[webtub::sessionKeyEmail]);
       unset($_SESSION[webtub::sessionKeyFullname]);
@@ -31,7 +31,7 @@ class account {
       session_destroy();
     }
   }
-  
+
   public function authenticate() {
     $lightOpenID = new LightOpenID();
     $lightOpenID->identity = 'http://login.telldus.com';
@@ -53,7 +53,7 @@ class account {
       header('Location: '. $lightOpenID->authUrl(true) );
     }
   }
-  
+
   public function setAccount() {
     $db = new dbMgr();
     $sql = 'SELECT `accessToken`, `accessTokenSecret` FROM `accounts` a
@@ -76,7 +76,7 @@ class account {
     $db->closeStmt();
     return;
   }
-  
+
   public function initTelldusData() {
     $this->token = $_SESSION[webtub::sessionKeyAccessToken];
     $this->tokenSecret = $_SESSION[webtub::sessionKeyAccessTokenSecret];
@@ -84,8 +84,9 @@ class account {
       $this->setTokens();
     }
     $this->telldusData = new telldusdata($this);
+
     if(!$this->telldusData->errorMessage)
-    {    
+    {
       $settings = array();
       foreach($this->settings as $setting) {
         if($setting['sourceEndpoint']) {
@@ -120,13 +121,13 @@ class account {
       return false;
     }
   }
-  
+
   private function isAuthenticated() {
-    return 
+    return
       isset($_SESSION[webtub::sessionKeyEmail]);
   }
-  
-  public function setTokens() {   
+
+  public function setTokens() {
     $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'));
     $consumer->getRequestToken(constant('TELLDUS_REQUEST_TOKEN'), constant('TELLDUS_BASE_URL') . '/access-token');
     $_SESSION[webtub::sessionKeyRequestToken] = $consumer->getToken();
@@ -134,8 +135,8 @@ class account {
     $url = $consumer->getAuthorizeUrl(constant('TELLDUS_AUTHORIZE_TOKEN'));
     header('Location:'.$url);
   }
-  
-  public function setAccessTokens() {  
+
+  public function setAccessTokens() {
     $consumer = new HTTP_OAuth_Consumer(constant('TELLDUS_PUBLIC_KEY'), constant('TELLDUS_PRIVATE_KEY'), $_SESSION[webtub::sessionKeyRequestToken], $_SESSION[webtub::sessionKeyRequestTokenSecret]);
     try {
       $consumer->getAccessToken(constant('TELLDUS_ACCESS_TOKEN'));
@@ -149,7 +150,7 @@ class account {
     }
     return false;
   }
-  
+
   // List all settings
   public function listSettings()
   {
@@ -164,94 +165,94 @@ class account {
     $db->closeStmt();
     return $list;
   }
-  
+
   // Update settings from post
   public function updateSettings($post) {
     foreach($post as $key=>$value) {
       $this->updateSetting($key, $value);
     }
   }
-    
+
   // Update setting in db
-  private function updateSetting($key, $value) 
+  private function updateSetting($key, $value)
   {
-    try 
+    try
     {
       $list = array();
       $db = new dbMgr();
-      $sql = 'SELECT `settingKey`, `value` FROM `tubAccountSettings` a 
+      $sql = 'SELECT `settingKey`, `value` FROM `tubAccountSettings` a
        WHERE email = ? AND settingKey = ?';
       $db->query($sql, 'ss', $this->email, $key);
       $list = $db->getRowsAsArray();
       if(count($list) > 0)
       {
         $sql = 'UPDATE `tubAccountSettings` SET value=? WHERE email=? AND settingKey=?';
-        $db->query($sql, 'sss', $value, $this->email, $key);          
-      } 
-      else 
+        $db->query($sql, 'sss', $value, $this->email, $key);
+      }
+      else
       {
         $sql = 'INSERT INTO `tubAccountSettings` VALUES (\'\', ?, ?, ?)';
-        $db->query($sql, 'sss', $this->email, $key, $value);                  
+        $db->query($sql, 'sss', $this->email, $key, $value);
       }
       return true;
     }
-    catch (Exception $ex) 
+    catch (Exception $ex)
     {
-      $errorMessage = $ex->getMessage();  
+      $errorMessage = $ex->getMessage();
     }
     return false;
   }
-    
+
   // Get next tub time from db
-  private function getTubTime() 
+  private function getTubTime()
   {
-    try 
+    try
     {
       $list = array();
       $db = new dbMgr();
-      $sql = 'SELECT `id`, `time`, `temp`, `activated`, `deactivated` FROM `tubTimes` t 
+      $sql = 'SELECT `id`, `time`, `temp`, `activated`, `deactivated` FROM `tubTimes` t
        WHERE email = ? AND time > ?';
       $db->query($sql, 'si', $this->email, time() - 3600); // Get times that end less are more than an hour ago
       return $db->getRow();
     }
-    catch (Exception $ex) 
+    catch (Exception $ex)
     {
-      $errorMessage = $ex->getMessage();  
+      $errorMessage = $ex->getMessage();
     }
     return false;
   }
-    
+
   // Update or create tub time in db
-  public function updateOrCreateTubTime($time, $temp) 
+  public function updateOrCreateTubTime($time, $temp)
   {
-    try 
+    try
     {
       if($existing = $this->getTubTime())
       {
         $db = new dbMgr();
-        $sql = 'UPDATE `tubTimes` 
+        $sql = 'UPDATE `tubTimes`
          SET time = ?, temp = ?, activated = 0, deactivated = 0
          WHERE id = ?';
         $db->query($sql, 'idi', $time, $temp, $existing['id']);
       }
-      else 
+      else
       {
         $db = new dbMgr();
         $sql = 'INSERT INTO `tubTimes` VALUES(\'\', ?, ?, ?, 0, 0, ?)';
-        $db->query($sql, 'sidi', $this->email, $time, $temp, time());     
+        $db->query($sql, 'sidi', $this->email, $time, $temp, time());
       }
     }
-    catch (Exception $ex) 
+    catch (Exception $ex)
     {
-      $errorMessage = $ex->getMessage();  
+      $errorMessage = $ex->getMessage();
     }
     return false;
   }
-    
+
   // Update or create tub time in db
-  public function deleteTubTime() 
+  public function deleteTubTime()
   {
-    try 
+    try
     {
       if($existing = $this->getTubTime())
       {
@@ -264,14 +265,14 @@ class account {
           $this->telldusData->turnOffDevice($this->settings['tubDeviceId']['value']);
         }
         $db = new dbMgr();
-        $sql = 'DELETE FROM `tubTimes` 
+        $sql = 'DELETE FROM `tubTimes`
          WHERE id = ?';
         $db->query($sql, 'i', $existing['id']);
       }
     }
-    catch (Exception $ex) 
+    catch (Exception $ex)
     {
-      $errorMessage = $ex->getMessage();  
+      $errorMessage = $ex->getMessage();
       var_dump($errorMessage);
       die();
     }
