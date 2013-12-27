@@ -9,7 +9,7 @@ class cron
     $this->tokens = $this->listUserTokens();
     $this->telldusData = new telldusData(false);
   }
-  
+
   public function checkTubs() {
     // Check activated tubs
     logger::log("Check for tubs with cron", ALL);
@@ -24,12 +24,10 @@ class cron
         // Check if tub should be turned off
         try
         {
-          $tubShouldBeTurnedOff = null;
-          $currentTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
-          $coolingPerHour = 0.5;
-          $hoursLeft = ($activeTubTime['time'] - time()) / 3600;          
-          logger::log("Hours left: " . $hoursLeft . ". Current temp: " . $currentTemp . ". Wanted temp: " . $activeTubTime['temp'], DEBUG);          
-          if(($currentTemp - ($coolingPerHour * $hoursLeft) >= $activeTubTime['temp']) || ($hoursLeft < 0 && $currentTemp >= $activeTubTime['temp']))
+          $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
+          $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
+          $tubShouldBeTurnedOff = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time']);
+          if($tubShouldBeTurnedOff)
           {
             $tubShouldBeTurnedOff = true;
             $response = $this->telldusData->turnOffDevice($settings['tubDeviceId']);
@@ -38,9 +36,9 @@ class cron
               $this->markTubTimeAsDeactivated($activeTubTime['id']);
               logger::log('Successfully turned off device '.$settings['tubDeviceId'], DEBUG);
             }
-            else 
+            else
             {
-              logger::log('Failed to turned off device '.$settings['tubDeviceId'], WARNING);              
+              logger::log('Failed to turned off device '.$settings['tubDeviceId'], WARNING);
             }
           }
         }
@@ -62,25 +60,20 @@ class cron
         // Check if tub should be turned on
         try
         {
-          $tubShouldBeTurnedOn = null;
-          $currentTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
-          $coolingPerHour = 0.5;
-          $warmingPerHour = 2.2;
-          $hoursLeft = ($futureInactiveTubTime['time'] - time()) / 3600;
-          logger::log("Hours left: " . $hoursLeft . ". Current temp: " . $currentTemp . ". Wanted time: " . date('Ymd H:i', $futureInactiveTubTime['time']) . ". Wanted temp: " . $futureInactiveTubTime['temp'], DEBUG);
-          logger::log("If now: " . ($currentTemp + ($warmingPerHour * ($hoursLeft - 1)) - ($coolingPerHour * 1)), DEBUG);
-          if($currentTemp + ($warmingPerHour * ($hoursLeft - 1)) - ($coolingPerHour * 1) <= $futureInactiveTubTime['temp'])
+          $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
+          $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
+          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $futureInactiveTubTime['temp'], $futureInactiveTubTime['time']);
+          if($tubShouldBeTurnedOn)
           {
-            $tubShouldBeTurnedOn = true;
             $response = $this->telldusData->turnOnDevice($settings['tubDeviceId']);
             if(isset($response->status) && $response->status == 'success')
             {
               $this->markTubTimeAsActivated($futureInactiveTubTime['id']);
               logger::log('Successfully turned on device '.$futureInactiveTubTime['id'], DEBUG);
             }
-            else 
+            else
             {
-              logger::log('Failed to turn on device '.$futureInactiveTubTime['id'], WARNING);              
+              logger::log('Failed to turn on device '.$futureInactiveTubTime['id'], WARNING);
             }
           }
         }
@@ -91,7 +84,19 @@ class cron
       }
     }
   }
-  
+
+  private function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
+    $coolingPerHour = 0.5;
+    $warmingPerHour = 2.2;
+    $hoursLeft = ($requestedTime - time()) / 3600;
+    if($hoursLeft <= 0) {
+      return $currentTubTemp < $requestedTemp;
+    } else if($hoursLeft < 1) {
+      return $currentTubTemp - ($coolingPerHour * $hoursLeft) < $requestedTemp;
+    }
+    return ($currentTubTemp + ($warmingPerHour * ($hoursLeft - 1)) - ($coolingPerHour * 1) <= $requestedTemp);
+  }
+
   private function validateTubTime($tubTime, &$token, &$tokenSecret, &$settings) {
     // Check that user has tokens in db
     if(isset($this->tokens[$tubTime['email']]['token']) && $this->tokens[$tubTime['email']]['token'])
@@ -108,43 +113,43 @@ class cron
     }
     return $token && $tokenSecret && $settings['tubSensorId'] && $settings['tubDeviceId'];
   }
-  
+
   private function listActiveTubTimes() {
     $list = array();
     $db = new dbMgr();
-    $sql = 'SELECT `id`, `email`, `time`, `temp` FROM `tubTimes` t 
+    $sql = 'SELECT `id`, `email`, `time`, `temp` FROM `tubTimes` t
     WHERE activated = 1 AND deactivated = 0';
     $db->query($sql);
     return $db->getRowsAsArray();
   }
-  
+
   private function listFutureInactiveTubTimes() {
     $list = array();
     $db = new dbMgr();
-    $sql = 'SELECT `id`, `email`, `time`, `temp` FROM `tubTimes` t 
+    $sql = 'SELECT `id`, `email`, `time`, `temp` FROM `tubTimes` t
     WHERE activated = 0';
     $db->query($sql);
     return $db->getRowsAsArray();
   }
-  
+
   private function markTubTimeAsDeactivated($id) {
     $list = array();
     $db = new dbMgr();
-    $sql = 'UPDATE `tubTimes` t 
+    $sql = 'UPDATE `tubTimes` t
     SET deactivated = 1
     WHERE id = ?';
     $db->query($sql, 'i', $id);
   }
-  
+
   private function markTubTimeAsActivated($id) {
     $list = array();
     $db = new dbMgr();
-    $sql = 'UPDATE `tubTimes` t 
+    $sql = 'UPDATE `tubTimes` t
     SET activated = 1
     WHERE id = ?';
     $db->query($sql, 'i', $id);
   }
-  
+
   private function listUserSettings() {
     $settings = array();
     $db = new dbMgr();
@@ -159,9 +164,9 @@ class cron
       $settings[$row['email']][$row['settingKey']] = $row['value'];
     }
     $db->closeStmt();
-    return $settings;    
+    return $settings;
   }
-  
+
   private function listUserTokens() {
     $tokens = array();
     $db = new dbMgr();
@@ -177,6 +182,6 @@ class cron
       $tokens[$row['email']]['tokenSecret'] = $row['accessTokenSecret'];
     }
     $db->closeStmt();
-    return $tokens;    
+    return $tokens;
   }
 }
