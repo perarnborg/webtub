@@ -92,11 +92,11 @@ class cron
             if(isset($response->status) && $response->status == 'success')
             {
               $this->markTubTimeAsActivated($futureInactiveTubTime['id']);
-              logger::log('Successfully turned on device '.$futureInactiveTubTime['id'], DEBUG);
+              logger::log('Successfully turned on device '.$settings['tubDeviceId'], DEBUG);
             }
             else
             {
-              logger::log('Failed to turn on device '.$futureInactiveTubTime['id'], WARNING);
+              logger::log('Failed to turn on device '.$settings['tubDeviceId'], WARNING);
             }
           }
         }
