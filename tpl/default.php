@@ -33,8 +33,8 @@
     <label for="js-time">Time (HH:MM): </label> <input type="text" id="js-time" name="time" maxlength="5" value="<?php echo $account->tubTime ? date('H:i', $account->tubTime['time']) : '' ?>" />
   </div>
   <div class="datetime">
-    <label for="js-datetime">Time: </label> <input type="datetime-local" id="js-datetime" name="datetime" value="<?php echo $account->tubTime ? date('Y-m-d', $account->tubTime['time']) . 'T' . date('H:i', $account->tubTime['time']) . '' : '' ?>" min="<?php echo date('Y-m-d') . 'T' . date('H:i') ?>" />
-  </div>  
+    <label for="js-datetime">Time: </label> <input type="datetime-local" id="js-datetime" name="datetime" value="<?php echo $account->tubTime ? date('Y-m-d', $account->tubTime['time']) . 'T' . date('H:i', $account->tubTime['time']) . '' : '' ?>" min="<?php echo date('Y-m-d', time() - 3600) . 'T' . date('H:i', time() - 3600) ?>" />
+  </div>
   <div>
     <label for="js-temp">Temp (&deg;C): </label> <input type="text" id="js-temp" name="temp" maxlength="5" value="<?php echo $account->tubTime ? $account->tubTime['temp'] : $account->settings['defaultTemp']['value']; ?>" />
   </div>

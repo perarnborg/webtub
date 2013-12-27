@@ -5,7 +5,7 @@ class cron
   private $tokens, $settings, $telldusData;
   public function __construct($testMode = false)
   {
-    $this->settings = new StdClass();
+    $this->settings = array();
     if(!$testMode) {
       $this->settings = $this->listUserSettings();
       $this->tokens = $this->listUserTokens();

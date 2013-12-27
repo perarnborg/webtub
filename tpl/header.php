@@ -18,7 +18,7 @@
 <meta property="og:locale" content="en_US" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <!--meta property="fb:app_id" content="193334507468525" /-->
-<link rel="shortcut icon" href="/favicon.ico">  
+<link rel="shortcut icon" href="/favicon.ico">
 <link rel="profile" href="http://gmpg.org/xfn/11" />
 <link rel="stylesheet" href="/res/style/style.css" type="text/css" media="all" />
 <!--[if lt IE 10]>
@@ -46,7 +46,7 @@
       <nav>
         <ul>
           <?php if(isset($account)): ?>
-          <li class="link-settings js-toggle-settings"><a href="/settings">Settings</li>
+          <li class="link-settings js-toggle-settings"><a href="/settings">Settings</a></li>
           <?php endif; ?>
         </ul>
       </nav>
@@ -62,17 +62,17 @@
       Logged in as <?php echo $account->email; ?>
       <form action="/post/settings" method="post">
       <?php
-      foreach($account->settings as $setting) { 
+      foreach($account->settings as $setting) {
       ?>
         <label for="<?php echo $setting['key']; ?>" class="block"><?php echo $setting['name']; ?> <?php if($setting['required']): echo '*'; endif; ?></label>
         <?php if(isset($setting['values'])) {
           foreach($setting['values'] as $item) {
             echo '<div><input type="radio" name="' . $setting['key'] . '" id="' . $setting['key'] . '-' . $item->id . '" value="' . $item->id . '"' . ($item->id == $setting['value'] ? ' checked="checked"' : '') . '> <label for="' . $setting['key'] . '-' . $item->id . '">' . $item->id . ' - ' . $item->name . '</label></div>';
-          }      
+          }
         } else {
           echo '<input type="text" maxlength="252" name="' . $setting['key'] . '" value="' . $setting['value'] . '" />';
         } ?>
-      <?php 
+      <?php
       }
       ?>
       <div>
