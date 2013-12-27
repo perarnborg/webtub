@@ -5,6 +5,7 @@ class cron
   private $tokens, $settings, $telldusData;
   public function __construct($testMode = false)
   {
+    $this->settings = new StdClass();
     if(!$testMode) {
       $this->settings = $this->listUserSettings();
       $this->tokens = $this->listUserTokens();
@@ -23,19 +24,20 @@ class cron
       if($this->validateTubTime($activeTubTime, $token, $tokenSecret, $settings)) {
         logger::log("Valid tubtime", DEBUG);
         $this->telldusData->setTokens($token, $tokenSecret);
+        $tubShouldBeTurnedOff = null;
         // Check if tub should be turned off
         try
         {
           $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
           $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
+          $tubIsTurnedOn = $this->telldusData->getDeviceState($settings['tubDeviceId']);
+          $keepTimeAliveUntil = $settings['keepWarmFor'] ? $activeTubTime['time'] + ((int)$settings['keepWarmFor'] * 60) : $activeTubTime['time'];
           $tubShouldBeTurnedOff = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time']);
           if($tubShouldBeTurnedOff)
           {
-            $tubShouldBeTurnedOff = true;
             $response = $this->telldusData->turnOffDevice($settings['tubDeviceId']);
             if(isset($response->status) && $response->status == 'success')
             {
-              $this->markTubTimeAsDeactivated($activeTubTime['id']);
               logger::log('Successfully turned off device '.$settings['tubDeviceId'], DEBUG);
             }
             else
@@ -47,6 +49,25 @@ class cron
         catch(Exception $ex)
         {
           mail("kontakt@perarnborg.se", "Cron error in webtub", "Error checking tub time. Should be turned off: " . $tubShouldBeTurnedOff . "\n\nTub time: " . var_export($activeTubTime, true) . "\n\nError message: " . $ex->getMessage());
+        }
+        if($keepTimeAliveUntil >= time())
+        {
+          if($tubShouldBeTurnedOff === true && !$tubIsTurnedOn)
+          {
+            try {
+              $response = $this->telldusData->turnOffDevice($settings['tubDeviceId']);
+              if(isset($response->status) && $response->status == 'success')
+              {
+                logger::log('Successfully turned off device '.$settings['tubDeviceId'], DEBUG);
+              }
+              else
+              {
+                logger::log('Failed to turned off device '.$settings['tubDeviceId'], WARNING);
+              }
+            } catch(Exception $ex) {}
+          }
+          $this->markTubTimeAsDeactivated($activeTubTime['id']);
+          logger::log('Let tub time sleep for '.$settings['tubDeviceId'], DEBUG);
         }
       }
     }
@@ -88,8 +109,11 @@ class cron
   }
 
   public function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
-    $c = 0.0003;
-    $Td = 150;
+    if($requestedTime < time()) {
+      return $currentTubTemp < $requestedTemp;
+    }
+    $c = isset($this->settings['constantC']) ? $this->settings['constantC'] : 0.0003;
+    $Td = isset($this->settings['constantTd']) ? $this->settings['constantTd'] : 150;
     $secondsInWeek = 7 * 24 * 60 * 60;
     $t = $secondsInWeek / 60;
     $requestedTime = ($requestedTime - time() + $secondsInWeek) / 60;

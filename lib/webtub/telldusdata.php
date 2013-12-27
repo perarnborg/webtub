@@ -35,7 +35,6 @@ class telldusdata {
         }
         catch(Exception $ex)
         {
-          var_dump($ex);
           $this->errorMessage = $ex->getMessage();
         }
       }
