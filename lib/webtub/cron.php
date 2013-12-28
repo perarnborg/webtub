@@ -31,7 +31,7 @@ class cron
           $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
           $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
           $tubIsTurnedOn = $this->telldusData->getDeviceState($settings['tubDeviceId']);
-          $keepTimeAliveUntil = $settings['keepWarmFor'] ? $activeTubTime['time'] + ((int)$settings['keepWarmFor'] * 60) : $activeTubTime['time'];
+          $keepTimeAliveUntil = isset($settings['keepWarmFor']) && $settings['keepWarmFor'] ? $activeTubTime['time'] + ((int)$settings['keepWarmFor'] * 60) : $activeTubTime['time'];
           $tubShouldBeTurnedOff = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time']);
           if($tubShouldBeTurnedOff)
           {
@@ -50,7 +50,7 @@ class cron
         {
           mail("kontakt@perarnborg.se", "Cron error in webtub", "Error checking tub time. Should be turned off: " . $tubShouldBeTurnedOff . "\n\nTub time: " . var_export($activeTubTime, true) . "\n\nError message: " . $ex->getMessage());
         }
-        if($keepTimeAliveUntil >= time())
+        if($keepTimeAliveUntil <= time())
         {
           if($tubShouldBeTurnedOff === true && !$tubIsTurnedOn)
           {
