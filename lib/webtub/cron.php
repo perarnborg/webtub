@@ -112,8 +112,8 @@ class cron
     if($requestedTime < time()) {
       return $currentTubTemp < $requestedTemp;
     }
-    $c = isset($this->settings['constantC']) ? $this->settings['constantC'] : 0.0003;
-    $Td = isset($this->settings['constantTd']) ? $this->settings['constantTd'] : 150;
+    $c = isset($this->settings['constantC']) && $this->settings['constantC'] ? $this->settings['constantC'] : 0.0003;
+    $Td = isset($this->settings['constantTd']) && $this->settings['constantTd'] ? $this->settings['constantTd'] : 150;
     $secondsInWeek = 7 * 24 * 60 * 60;
     $t = $secondsInWeek / 60;
     $requestedTime = ($requestedTime - time() + $secondsInWeek) / 60;
