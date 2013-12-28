@@ -122,7 +122,7 @@ class cron
     }
     if(isset($response->status) && $response->status == 'success')
     {
-      logger::log('Successfully turned on device '.$id, DEBUG);
+      logger::log('Successfully turned ' . ($turnOn ? 'on' : 'off') . ' device '.$id, DEBUG);
       return true;
     }
     else
