@@ -32,38 +32,19 @@ class cron
           $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
           $tubIsTurnedOn = $this->telldusData->getDeviceState($settings['tubDeviceId']);
           $keepTimeAliveUntil = isset($settings['keepWarmFor']) && $settings['keepWarmFor'] ? $activeTubTime['time'] + ((int)$settings['keepWarmFor'] * 60) : $activeTubTime['time'];
-          $tubShouldBeTurnedOff = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time']);
-          if($tubShouldBeTurnedOff)
-          {
-            $response = $this->telldusData->turnOffDevice($settings['tubDeviceId']);
-            if(isset($response->status) && $response->status == 'success')
-            {
-              logger::log('Successfully turned off device '.$settings['tubDeviceId'], DEBUG);
-            }
-            else
-            {
-              logger::log('Failed to turned off device '.$settings['tubDeviceId'], WARNING);
-            }
-          }
+          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time']);
+          $this->turnTubOnOrOff($settings['tubDeviceId'], $tubShouldBeTurnedOn);
         }
         catch(Exception $ex)
         {
-          mail("kontakt@perarnborg.se", "Cron error in webtub", "Error checking tub time. Should be turned off: " . $tubShouldBeTurnedOff . "\n\nTub time: " . var_export($activeTubTime, true) . "\n\nError message: " . $ex->getMessage());
+          mail("kontakt@perarnborg.se", "Cron error in webtub", "Error checking tub time. Should be turned on: " . $tubShouldBeTurnedOn . "\n\nTub time: " . var_export($activeTubTime, true) . "\n\nError message: " . $ex->getMessage());
         }
         if($keepTimeAliveUntil <= time())
         {
           if($tubShouldBeTurnedOff === true && !$tubIsTurnedOn)
           {
             try {
-              $response = $this->telldusData->turnOffDevice($settings['tubDeviceId']);
-              if(isset($response->status) && $response->status == 'success')
-              {
-                logger::log('Successfully turned off device '.$settings['tubDeviceId'], DEBUG);
-              }
-              else
-              {
-                logger::log('Failed to turned off device '.$settings['tubDeviceId'], WARNING);
-              }
+              $this->turnTubOnOrOff($settings['tubDeviceId'], false);
             } catch(Exception $ex) {}
           }
           $this->markTubTimeAsDeactivated($activeTubTime['id']);
@@ -88,21 +69,15 @@ class cron
           $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $futureInactiveTubTime['temp'], $futureInactiveTubTime['time']);
           if($tubShouldBeTurnedOn)
           {
-            $response = $this->telldusData->turnOnDevice($settings['tubDeviceId']);
-            if(isset($response->status) && $response->status == 'success')
+            if($this->turnTubOnOrOff($settings['tubDeviceId'], true))
             {
               $this->markTubTimeAsActivated($futureInactiveTubTime['id']);
-              logger::log('Successfully turned on device '.$settings['tubDeviceId'], DEBUG);
-            }
-            else
-            {
-              logger::log('Failed to turn on device '.$settings['tubDeviceId'], WARNING);
             }
           }
         }
         catch(Exception $ex)
         {
-          mail("kontakt@perarnborg.se", "Cron error in webtub", "Error checking tub time. Should be turned n: " . $tubShouldBeTurnedOn . "\n\nTub time: " . var_export($futureInactiveTubTime, true) . "\n\nError message: " . $ex->getMessage());
+          mail("kontakt@perarnborg.se", "Cron error in webtub", "Error checking tub time. Should be turned on: " . $tubShouldBeTurnedOn . "\n\nTub time: " . var_export($futureInactiveTubTime, true) . "\n\nError message: " . $ex->getMessage());
         }
       }
     }
@@ -133,6 +108,28 @@ class cron
       return $currentTubTemp - ($coolingPerHour * $hoursLeft) < $requestedTemp;
     }
     return ($currentTubTemp + ($warmingPerHour * ($hoursLeft - 1)) - ($coolingPerHour * 1) <= $requestedTemp);
+  }
+
+  private function turnTubOnOrOff($id, $turnOn) {
+    $response = null;
+    if($turnOn)
+    {
+      $response = $this->telldusData->turnOnDevice($id);
+    }
+    else
+    {
+      $response = $this->telldusData->turnOffDevice($id);
+    }
+    if(isset($response->status) && $response->status == 'success')
+    {
+      logger::log('Successfully turned on device '.$id, DEBUG);
+      return true;
+    }
+    else
+    {
+      logger::log('Failed to turn on device '.$id, WARNING);
+      return false;
+    }
   }
 
   private function validateTubTime($tubTime, &$token, &$tokenSecret, &$settings) {
