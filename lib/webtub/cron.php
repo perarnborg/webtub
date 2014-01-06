@@ -42,9 +42,10 @@ class cron
           // Check if tub should be turned on or off
           try
           {
-            $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
+            $tubLastChecked = null;
+            $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId'], $tubLastChecked));
             $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
-            $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time'], $settings);
+            $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time'], $tubLastChecked, $settings);
             logger::log("Active tubtime should be turned on: " . $tubShouldBeTurnedOn . ". Is turned on: " . $tubIsTurnedOn, DEBUG);
             if($tubShouldBeTurnedOn != $tubIsTurnedOn) {
               $this->turnTubOnOrOff($settings['tubDeviceId'], $tubShouldBeTurnedOn);
@@ -68,9 +69,10 @@ class cron
         // Check if tub should be turned on
         try
         {
-          $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
+          $tubLastChecked = null;
+          $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId'], $tubLastChecked));
           $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
-          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $futureInactiveTubTime['temp'], $futureInactiveTubTime['time'], $settings);
+          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $futureInactiveTubTime['temp'], $futureInactiveTubTime['time'], $tubLastChecked, $settings);
           logger::log("Inactive tubtime should be turned on: " . $tubShouldBeTurnedOn, DEBUG);
           if($tubShouldBeTurnedOn)
           {
@@ -88,14 +90,15 @@ class cron
     }
   }
 
-  public function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime, $settings) {
+  public function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime, $tubLastChecked, $settings) {
     if($requestedTime < time()) {
       return $currentTubTemp < $requestedTemp;
     }
-    $c = isset($settings['constantC']) && $settings['constantC'] ? (float)$settings['constantC'] : 0.0003;
-    $Td = isset($settings['constantTd']) && $settings['constantTd'] ? (float)$settings['constantTd'] : 150;
-    $t = 0; // Let current time be represented by 0
-    $requestedTime = ($requestedTime - time()) / 60; // Convert requestedTime to minutes from now
+    $c = $this->getSettingsConstant($settings, 'constantC', 0.00029);
+    $Td = $this->getSettingsConstant($settings, 'constantTd', 125);
+    var_dump($c, $Td);
+    $t = 0; // Let tub last checked be represented by 0
+    $requestedTime = ($requestedTime - $tubLastChecked) / 60; // Convert requestedTime to minutes from tub last checked
     $coff = ($currentTubTemp - $currentAirTemp) / exp(-$c * $t);
     $con = ($requestedTemp - $currentAirTemp - $Td) / exp(-$c * $requestedTime);
     $x = -1 / $c * log($Td/($coff - $con));
@@ -222,5 +225,23 @@ class cron
     }
     $db->closeStmt();
     return $tokens;
+  }
+
+  private function getSettingsConstant($settings, $key, $defaultValue) {
+    if(isset($settings[$key]))
+    {
+      if(is_array($settings[$key]))
+      {
+        if($settings[$key]['value'])
+        {
+          return $settings[$key]['value'];
+        }
+      }
+      else if($settings[$key])
+      {
+        return floatval($settings[$key]);
+      }
+    }
+    return $defaultValue;
   }
 }
