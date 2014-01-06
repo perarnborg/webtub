@@ -19,27 +19,13 @@ class cron
     $activeTubTimes = $this->listActiveTubTimes();
     foreach($activeTubTimes as $activeTubTime)
     {
-      logger::log("Active tubtime", DEBUG);
+      logger::log("Active tubtime " . $activeTubTime['id'], DEBUG);
       $token = $tokenSecret = $settings = null;
       if($this->validateTubTime($activeTubTime, $token, $tokenSecret, $settings)) {
         $this->telldusData->setTokens($token, $tokenSecret);
-        // Check if tub should be turned off
-        try
-        {
-          $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
-          $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
-          $tubIsTurnedOn = $this->telldusData->getDeviceState($settings['tubDeviceId']);
-          $keepTimeAliveUntil = isset($settings['keepWarmFor']) && $settings['keepWarmFor'] ? $activeTubTime['time'] + ((int)$settings['keepWarmFor'] * 60) : ($activeTubTime['time'] + 3600);
-          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time'], $settings);
-          logger::log("Active tubtime should be turned on: " . $tubShouldBeTurnedOn . ". Is turned on: " . $tubIsTurnedOn, DEBUG);
-          if($tubShouldBeTurnedOn != $tubIsTurnedOn) {
-            $this->turnTubOnOrOff($settings['tubDeviceId'], $tubShouldBeTurnedOn);
-          }
-        }
-        catch(Exception $ex)
-        {
-          mail("kontakt@perarnborg.se", "Cron error in webtub", "Error checking tub time. Should be turned on: " . $tubShouldBeTurnedOn . "\n\nTub time: " . var_export($activeTubTime, true) . "\n\nError message: " . $ex->getMessage());
-        }
+        $tubIsTurnedOn = $this->telldusData->getDeviceState($settings['tubDeviceId']);
+        $keepTimeAliveUntil = isset($settings['keepWarmFor']) && $settings['keepWarmFor'] ? $activeTubTime['time'] + ((int)$settings['keepWarmFor'] * 60) : ($activeTubTime['time'] + 3600);
+        // Check if tub time should be put to sleep (if keep time alive has run out...)
         if($keepTimeAliveUntil <= time())
         {
           if($tubIsTurnedOn)
@@ -49,7 +35,25 @@ class cron
             } catch(Exception $ex) {}
           }
           $this->markTubTimeAsDeactivated($activeTubTime['id']);
-          logger::log('Let tub time sleep for '.$settings['tubDeviceId'], DEBUG);
+          logger::log('Let tub time ' . $activeTubTime['id'] . ' sleep (device id '.$settings['tubDeviceId'] . ')', DEBUG);
+        }
+        else
+        {
+          // Check if tub should be turned on or off
+          try
+          {
+            $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
+            $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
+            $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time'], $settings);
+            logger::log("Active tubtime should be turned on: " . $tubShouldBeTurnedOn . ". Is turned on: " . $tubIsTurnedOn, DEBUG);
+            if($tubShouldBeTurnedOn != $tubIsTurnedOn) {
+              $this->turnTubOnOrOff($settings['tubDeviceId'], $tubShouldBeTurnedOn);
+            }
+          }
+          catch(Exception $ex)
+          {
+            mail("kontakt@perarnborg.se", "Cron error in webtub", "Error checking tub time. Should be turned on: " . $tubShouldBeTurnedOn . "\n\nTub time: " . var_export($activeTubTime, true) . "\n\nError message: " . $ex->getMessage());
+          }
         }
       }
     }
@@ -57,7 +61,7 @@ class cron
     $futureInactiveTubTimes = $this->listFutureInactiveTubTimes();
     foreach($futureInactiveTubTimes as $futureInactiveTubTime)
     {
-      logger::log("Inactive tubtime", DEBUG);
+      logger::log("Inactive tubtime " . $futureInactiveTubTime['id'], DEBUG);
       $token = $tokenSecret = $settings = null;
       if($this->validateTubTime($futureInactiveTubTime, $token, $tokenSecret, $settings)) {
         $this->telldusData->setTokens($token, $tokenSecret);
