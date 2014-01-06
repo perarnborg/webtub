@@ -22,18 +22,19 @@ class cron
       logger::log("Active tubtime", DEBUG);
       $token = $tokenSecret = $settings = null;
       if($this->validateTubTime($activeTubTime, $token, $tokenSecret, $settings)) {
-        logger::log("Valid tubtime", DEBUG);
         $this->telldusData->setTokens($token, $tokenSecret);
-        $tubShouldBeTurnedOff = null;
         // Check if tub should be turned off
         try
         {
           $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
           $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
           $tubIsTurnedOn = $this->telldusData->getDeviceState($settings['tubDeviceId']);
-          $keepTimeAliveUntil = isset($settings['keepWarmFor']) && $settings['keepWarmFor'] ? $activeTubTime['time'] + ((int)$settings['keepWarmFor'] * 60) : $activeTubTime['time'];
-          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time']);
-          $this->turnTubOnOrOff($settings['tubDeviceId'], $tubShouldBeTurnedOn);
+          $keepTimeAliveUntil = isset($settings['keepWarmFor']) && $settings['keepWarmFor'] ? $activeTubTime['time'] + ((int)$settings['keepWarmFor'] * 60) : ($activeTubTime['time'] + 3600);
+          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time'], $settings);
+          logger::log("Active tubtime should be turned on: " . $tubShouldBeTurnedOn . ". Is turned on: " . $tubIsTurnedOn, DEBUG);
+          if($tubShouldBeTurnedOn != $tubIsTurnedOn) {
+            $this->turnTubOnOrOff($settings['tubDeviceId'], $tubShouldBeTurnedOn);
+          }
         }
         catch(Exception $ex)
         {
@@ -41,7 +42,7 @@ class cron
         }
         if($keepTimeAliveUntil <= time())
         {
-          if($tubShouldBeTurnedOff === true && !$tubIsTurnedOn)
+          if($tubIsTurnedOn)
           {
             try {
               $this->turnTubOnOrOff($settings['tubDeviceId'], false);
@@ -59,14 +60,14 @@ class cron
       logger::log("Inactive tubtime", DEBUG);
       $token = $tokenSecret = $settings = null;
       if($this->validateTubTime($futureInactiveTubTime, $token, $tokenSecret, $settings)) {
-        logger::log("Valid tubtime", DEBUG);
         $this->telldusData->setTokens($token, $tokenSecret);
         // Check if tub should be turned on
         try
         {
           $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId']));
           $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
-          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $futureInactiveTubTime['temp'], $futureInactiveTubTime['time']);
+          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $futureInactiveTubTime['temp'], $futureInactiveTubTime['time'], $settings);
+          logger::log("Inactive tubtime should be turned on: " . $tubShouldBeTurnedOn, DEBUG);
           if($tubShouldBeTurnedOn)
           {
             if($this->turnTubOnOrOff($settings['tubDeviceId'], true))
@@ -83,22 +84,21 @@ class cron
     }
   }
 
-  public function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
+  public function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime, $settings) {
     if($requestedTime < time()) {
       return $currentTubTemp < $requestedTemp;
     }
-    $c = isset($this->settings['constantC']) && $this->settings['constantC'] ? $this->settings['constantC'] : 0.0003;
-    $Td = isset($this->settings['constantTd']) && $this->settings['constantTd'] ? $this->settings['constantTd'] : 150;
-    $secondsInWeek = 7 * 24 * 60 * 60;
-    $t = $secondsInWeek / 60;
-    $requestedTime = ($requestedTime - time() + $secondsInWeek) / 60;
+    $c = isset($settings['constantC']) && $settings['constantC'] ? (float)$settings['constantC'] : 0.0003;
+    $Td = isset($settings['constantTd']) && $settings['constantTd'] ? (float)$settings['constantTd'] : 150;
+    $t = 0; // Let current time be represented by 0
+    $requestedTime = ($requestedTime - time()) / 60; // Convert requestedTime to minutes from now
     $coff = ($currentTubTemp - $currentAirTemp) / exp(-$c * $t);
     $con = ($requestedTemp - $currentAirTemp - $Td) / exp(-$c * $requestedTime);
     $x = -1 / $c * log($Td/($coff - $con));
     return $x < $t;
   }
 
-  private function _deprecated_tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime) {
+  private function _deprecated_tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime, $settings) {
     $coolingPerHour = 0.5;
     $warmingPerHour = 2.2;
     $hoursLeft = ($requestedTime - time()) / 3600;
@@ -127,7 +127,7 @@ class cron
     }
     else
     {
-      logger::log('Failed to turn on device '.$id, WARNING);
+      logger::log('Failed to turn  ' . ($turnOn ? 'on' : 'off') . '  device '.$id, WARNING);
       return false;
     }
   }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 header("Content-type: text/html; charset=utf-8");
 require_once 'HTTP/OAuth/Consumer.php';
 require_once 'config/main.php';

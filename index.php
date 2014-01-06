@@ -57,7 +57,7 @@ else
           }
           $temp =  floatval(str_replace(',','.',$_POST['temp']));
           $cron = new cron(true);
-          $turnOn = $cron->tubOnOrOff($account->telldusData->data['tubTemp'], $account->telldusData->data['airTemp'], $temp, $time);
+          $turnOn = $cron->tubOnOrOff($account->telldusData->data['tubTemp'], $account->telldusData->data['airTemp'], $temp, $time, $account->settings);
         }
         includer::includeFiles(array('header.php', 'test.php', 'footer.php'),
           array('account' => $account, 'turnOn' => $turnOn));
