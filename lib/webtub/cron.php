@@ -96,7 +96,6 @@ class cron
     }
     $c = $this->getSettingsConstant($settings, 'constantC', 0.00029);
     $Td = $this->getSettingsConstant($settings, 'constantTd', 125);
-    var_dump($c, $Td);
     $t = 0; // Let tub last checked be represented by 0
     $requestedTime = ($requestedTime - $tubLastChecked) / 60; // Convert requestedTime to minutes from tub last checked
     $coff = ($currentTubTemp - $currentAirTemp) / exp(-$c * $t);
