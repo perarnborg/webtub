@@ -29,15 +29,15 @@ class cookieMgr {
    */
   private function startCookie()
   {
-    
+
     if(isset($_COOKIE[config::COOKIE_NAME]))
     {
       $this->cookie = $_COOKIE[config::COOKIE_NAME];
-      
+
     }
     else
     {
-      setcookie(config::COOKIE_NAME, "asd", time()+60*60*24*180, '/'); // Remove this to work on all domains: , 
+      setcookie(config::COOKIE_NAME, "asd", time()+60*60*24*180, '/'); // Remove this to work on all domains: ,
     }
   }
 
@@ -102,7 +102,6 @@ class cookieMgr {
     if(isset($_COOKIE[config::COOKIE_NAME]))
     {
       $this->cookie = json_decode($_COOKIE[config::COOKIE_NAME]);
-      var_dump($_COOKIE);
       if(isset($this->cookie->$key))
       {
         return $this->cookie->$key;

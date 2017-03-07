@@ -60,6 +60,14 @@
     <div class="limiter">
       <br/>
       Logged in as <?php echo $account->email; ?>
+      <form method="post">
+        <label for="tub-mode">Tub mode</label>
+        <?php
+        foreach($account->modes as $item) {
+          echo '<div><input type="radio" name="tub-mode" id="tub-mode-' . $item->id . '" value="' . $item->id . '"' . ($item->id == $setting['value'] ? ' checked="checked"' : '') . '> <label for="' . $setting['key'] . '-' . $item->id . '">' . $item->id . ' - ' . $item->name . '</label></div>';
+        }
+        ?>
+      </form>
       <form action="/post/settings" method="post">
       <?php
       foreach($account->settings as $setting) {

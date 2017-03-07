@@ -28,8 +28,12 @@ else
     case '':
       if($account->initTelldusData())
       {
+        $startTime = tub::getStartTime($account->tubTime, $account->telldusData, $account->settings);
         includer::includeFiles(array('header.php', 'default.php', 'footer.php'),
-          array('account' => $account));
+          array(
+            'account' => $account,
+            'startTime' => $startTime
+          ));
       }
       else
       {
@@ -57,7 +61,7 @@ else
           }
           $temp =  floatval(str_replace(',','.',$_POST['temp']));
           $cron = new cron(true);
-          $turnOn = $cron->tubOnOrOff($account->telldusData->data['tubTemp'], $account->telldusData->data['airTemp'], $temp, $time, $account->telldusData->data['tubLastChecked'], $account->settings);
+          $turnOn = tub::tubOnOrOff($account->telldusData->data['tubTemp'], $account->telldusData->data['airTemp'], $temp, $time, $account->telldusData->data['tubLastChecked'], $account->settings);
         }
         includer::includeFiles(array('header.php', 'test.php', 'footer.php'),
           array('account' => $account, 'turnOn' => $turnOn));
@@ -91,6 +95,12 @@ else
             }
             if($time && $temp) {
               $account->updateOrCreateTubTime($time, $temp);
+              $account->initTelldusData();
+              if(tub::tubOnOrOff($account->telldusData->data['tubTemp'], $account->telldusData->data['airTemp'], $temp, $time, time(), $account->settings)) {
+                $account->telldusData->turnOnDevice($account->settings['tubDeviceId']['value']);
+                $tubTime = $account->getTubTime();
+                tub::markTubTimeAsActivated($tubTime['id']);
+              }
               header('Location: /');
               $pageExists = true;
             }

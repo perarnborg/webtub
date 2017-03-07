@@ -30,77 +30,78 @@ require_once config::libDir().'/utils/cacheImplements/memorycache.php';
 require_once config::libDir().'/utils/lightopenid.php';
 require_once config::libDir().'/webtub/account.php';
 require_once config::libDir().'/webtub/telldusdata.php';
+require_once config::libDir().'/webtub/tub.php';
 
 session_start();
 
 class config
-{  
+{
   //---------SESSION---------//
   const sessionName = 'webtub';
   const COOKIE_NAME = 'webtub';
   const userAgent = 'webtub';
 
   //---------LOGGER---------//
-  
+
   //PRINTALL, ALL, DEBUG, NOTICE, WARNING, ERROR, ALERT, NONE
-  
+
   const loggerSeverity = DEBUG;
   const backtrace = true;
-  
+
   //---------CACHE--------//
-  
+
   const timeToLive = 600;
-  public static function memcacheServers() 
+  public static function memcacheServers()
   {
     return (array(array('host'=>'127.0.0.1', 'port'=>'11211', 'weight'=>0)));
   }
-  
+
   //could be one of the following: file, no, db, memory
   const activeCache = 'file';
-  
+
   //get the curently active cache
   public static function getCache()
   {
     $cacheType = config::activeCache.'Cache';
     return new $cacheType();
   }
-  
-  
+
+
   //---------DIRS---------//
-  
+
   public static function getRoot()
   {
     $root = (PHP_SAPI == 'cli' && empty($_SERVER['REMOTE_ADDR'])) ? '.' : $_SERVER['DOCUMENT_ROOT'];
     return $root;
   }
-  
+
   public static function templateDir()
   {
     return config::getRoot() . '/tpl';
   }
-  
+
   public static function libDir()
   {
     return config::getRoot() . '/lib';
   }
-  
+
   public static function cacheDir()
   {
     return config::getRoot() . '/cache';
   }
-  
+
   public static function imageDir()
   {
     return config::getRoot() . '/res/img';
   }
-  
-  
+
+
   //---------DB---------//
   const dbHost = db::dbHost;
   const dbName = db::dbName;
   const dbUsername = db::dbUsername;
   const dbPassword = db::dbPassword;
-  
+
   //---------Defaults---------//
 }
 

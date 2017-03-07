@@ -34,7 +34,7 @@ class cron
               $this->turnTubOnOrOff($settings['tubDeviceId'], false);
             } catch(Exception $ex) {}
           }
-          $this->markTubTimeAsDeactivated($activeTubTime['id']);
+          tub::markTubTimeAsDeactivated($activeTubTime['id']);
           logger::log('Let tub time ' . $activeTubTime['id'] . ' sleep (device id '.$settings['tubDeviceId'] . ')', DEBUG);
         }
         else
@@ -45,7 +45,7 @@ class cron
             $tubLastChecked = null;
             $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId'], $tubLastChecked));
             $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
-            $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time'], $tubLastChecked, $settings);
+            $tubShouldBeTurnedOn = tub::tubOnOrOff($currentTubTemp, $currentAirTemp, $activeTubTime['temp'], $activeTubTime['time'], $tubLastChecked, $settings);
             logger::log("Active tubtime should be turned on: " . $tubShouldBeTurnedOn . ". Is turned on: " . $tubIsTurnedOn, DEBUG);
             if($tubShouldBeTurnedOn != $tubIsTurnedOn) {
               $this->turnTubOnOrOff($settings['tubDeviceId'], $tubShouldBeTurnedOn);
@@ -72,13 +72,13 @@ class cron
           $tubLastChecked = null;
           $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId'], $tubLastChecked));
           $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
-          $tubShouldBeTurnedOn = $this->tubOnOrOff($currentTubTemp, $currentAirTemp, $futureInactiveTubTime['temp'], $futureInactiveTubTime['time'], $tubLastChecked, $settings);
+          $tubShouldBeTurnedOn = tub::tubOnOrOff($currentTubTemp, $currentAirTemp, $futureInactiveTubTime['temp'], $futureInactiveTubTime['time'], $tubLastChecked, $settings);
           logger::log("Inactive tubtime should be turned on: " . $tubShouldBeTurnedOn, DEBUG);
           if($tubShouldBeTurnedOn)
           {
             if($this->turnTubOnOrOff($settings['tubDeviceId'], true))
             {
-              $this->markTubTimeAsActivated($futureInactiveTubTime['id']);
+              tub::markTubTimeAsActivated($futureInactiveTubTime['id']);
             }
           }
         }
@@ -88,32 +88,6 @@ class cron
         }
       }
     }
-  }
-
-  public function tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime, $tubLastChecked, $settings) {
-    if($requestedTime < time()) {
-      return $currentTubTemp < $requestedTemp;
-    }
-    $c = $this->getSettingsConstant($settings, 'constantC', 0.00029);
-    $Td = $this->getSettingsConstant($settings, 'constantTd', 125);
-    $t = 0; // Let tub last checked be represented by 0
-    $requestedTime = ($requestedTime - $tubLastChecked) / 60; // Convert requestedTime to minutes from tub last checked
-    $coff = ($currentTubTemp - $currentAirTemp) / exp(-$c * $t);
-    $con = ($requestedTemp - $currentAirTemp - $Td) / exp(-$c * $requestedTime);
-    $x = -1 / $c * log($Td/($coff - $con));
-    return $x < $t;
-  }
-
-  private function _deprecated_tubOnOrOff($currentTubTemp, $currentAirTemp, $requestedTemp, $requestedTime, $settings) {
-    $coolingPerHour = 0.5;
-    $warmingPerHour = 2.2;
-    $hoursLeft = ($requestedTime - time()) / 3600;
-    if($hoursLeft <= 0) {
-      return $currentTubTemp < $requestedTemp;
-    } else if($hoursLeft < 1) {
-      return $currentTubTemp - ($coolingPerHour * $hoursLeft) < $requestedTemp;
-    }
-    return ($currentTubTemp + ($warmingPerHour * ($hoursLeft - 1)) - ($coolingPerHour * 1) <= $requestedTemp);
   }
 
   private function turnTubOnOrOff($id, $turnOn) {
@@ -173,24 +147,6 @@ class cron
     return $db->getRowsAsArray();
   }
 
-  private function markTubTimeAsDeactivated($id) {
-    $list = array();
-    $db = new dbMgr();
-    $sql = 'UPDATE `tubTimes` t
-    SET deactivated = 1
-    WHERE id = ?';
-    $db->query($sql, 'i', $id);
-  }
-
-  private function markTubTimeAsActivated($id) {
-    $list = array();
-    $db = new dbMgr();
-    $sql = 'UPDATE `tubTimes` t
-    SET activated = 1
-    WHERE id = ?';
-    $db->query($sql, 'i', $id);
-  }
-
   private function listUserSettings() {
     $settings = array();
     $db = new dbMgr();
@@ -224,23 +180,5 @@ class cron
     }
     $db->closeStmt();
     return $tokens;
-  }
-
-  private function getSettingsConstant($settings, $key, $defaultValue) {
-    if(isset($settings[$key]))
-    {
-      if(is_array($settings[$key]))
-      {
-        if($settings[$key]['value'])
-        {
-          return $settings[$key]['value'];
-        }
-      }
-      else if($settings[$key])
-      {
-        return floatval($settings[$key]);
-      }
-    }
-    return $defaultValue;
   }
 }

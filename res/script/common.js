@@ -1,50 +1,23 @@
 if (typeof console == "undefined") {
-  var console = { log: function() {} };  
+  var console = { log: function() {} };
 }
-$(document).ready(function(){  
+$(document).ready(function(){
   if(Modernizr.inputtypes["datetime-local"]) {
     $("html").addClass("datetime-local");
   } else {
-    $("html").addClass("no-datetime-local");    
+    $("html").addClass("no-datetime-local");
   }
   $(".js-toggle-settings").click(function(e) { e.preventDefault(); $(".js-settings").slideToggle(100); });
   $(".js-change").click(function(e) { e.preventDefault(); changeTubState(this); });
   if($(".js-tub-temp").length > 0) {
     setInterval(function(){
-      var url = '/ajax/current';
-      jQuery.ajax({
-    		type: 'get',		
-    		url: url,
-      	timeout: 5000,
-      	dataType: 'json',
-        success: function (data, textStatus, XMLHttpRequest) {
-          if(data && data.tubTemp) {
-            $(".js-tub-temp").html(data.tubTemp);
-            $(".js-last-checked").html(data.lastChecked);
-            $(".js-tub-state").html(data.tubStateOn ? "on" : "off");
-            if(data.tubStateOn) {
-              $(".js-tub-state").removeClass("off").addClass("on");
-            } else {
-              $(".js-tub-state").addClass("off").removeClass("on");
-            }
-            if(data.lastCheckedRecently) {
-              $(".js-last-checked").removeClass("off");              
-            } else {
-              $(".js-last-checked").addClass("off");              
-            }            
-            if(data.airTemp) {
-              $(".js-air-temp").html(data.airTemp);              
-            }
-          }
-        },
-        complete: function(jqXHR, textStatus) {
-//            console.log(textStatus);
-        },
-        error: function(jqXHR, textStatus) {
-        }
-      });
+      getCurrent();
     }
     , 120000);
+    setTimeout(function(){
+      getCurrent();
+    }
+    , 1000);
   }
   if($("#js-date").length > 0) {
     $("#js-date").datepicker({minDate: new Date(), dateFormat: "yy-mm-dd"});
@@ -55,7 +28,7 @@ function changeTubState(sender) {
   var url = '/ajax/turn-' + (turnOn ? 'on' : 'off');
   $(sender).addClass("pending");
   jQuery.ajax({
-		type: 'get',		
+		type: 'get',
 		url: url,
   	timeout: 10000,
   	dataType: 'json',
@@ -79,6 +52,40 @@ function changeTubState(sender) {
     }
   });
 }
+function getCurrent() {
+  var url = '/ajax/current';
+  jQuery.ajax({
+    type: 'get',
+    url: url,
+    timeout: 5000,
+    dataType: 'json',
+    success: function (data, textStatus, XMLHttpRequest) {
+      if(data && data.tubTemp) {
+        $(".js-tub-temp").html(data.tubTemp);
+        $(".js-last-checked").html(data.lastChecked);
+        $(".js-tub-state").html(data.tubStateOn ? "on" : "off");
+        if(data.tubStateOn) {
+          $(".js-tub-state").removeClass("off").addClass("on");
+        } else {
+          $(".js-tub-state").addClass("off").removeClass("on");
+        }
+        if(data.lastCheckedRecently) {
+          $(".js-last-checked").removeClass("off");
+        } else {
+          $(".js-last-checked").addClass("off");
+        }
+        if(data.airTemp) {
+          $(".js-air-temp").html(data.airTemp);
+        }
+      }
+    },
+    complete: function(jqXHR, textStatus) {
+//            console.log(textStatus);
+    },
+    error: function(jqXHR, textStatus) {
+    }
+  });
+}
 function validateTubTime() {
   var dateOk = false;
   var timeOk = false;
@@ -91,7 +98,7 @@ function validateTubTime() {
         dateOk = true;
         timeOk = true;
       }
-    }    
+    }
     $("#js-date").val('');
     $("#js-time").val('');
   } else {
@@ -103,7 +110,7 @@ function validateTubTime() {
       }
     }
     if($("#js-time").val().length > 0) {
-      var time = $("#js-time").val().replace(":", '');    
+      var time = $("#js-time").val().replace(":", '');
       if(time.match(/^\d{1,2}\d{2}$/)) {
         $("#js-time").val(time);
         timeOk = true;
@@ -111,7 +118,7 @@ function validateTubTime() {
     }
   }
   if($("#js-temp").val().length > 0) {
-    var temp = parseFloat($("#js-temp").val().replace(",", "."));    
+    var temp = parseFloat($("#js-temp").val().replace(",", "."));
     if(temp > 5 && temp <= 40) {
       $("#js-temp").val(temp);
       tempOk = true;
@@ -136,13 +143,13 @@ function validateTubTime() {
 }
 function formatDate(date) {
   if(date != "Invalid Date" && typeof(date) == "object" && typeof(date.getFullYear) == "function") {
-    return '' + date.getFullYear() + '-' + (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1) + '-' + (date.getDate() < 10 ? '0' : '') + date.getDate();    
+    return '' + date.getFullYear() + '-' + (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1) + '-' + (date.getDate() < 10 ? '0' : '') + date.getDate();
   }
   return false;
 }
 function parseDate(input, format) {
   format = format || 'yyyy-mm-dd'; // default format
-  var parts = input.match(/(\d+)/g), 
+  var parts = input.match(/(\d+)/g),
       i = 0, fmt = {};
   // extract date-part indexes from the format
   format.replace(/(yyyy|dd|mm)/g, function(part) { fmt[part] = i++; });

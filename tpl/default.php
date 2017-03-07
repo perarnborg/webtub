@@ -38,7 +38,14 @@
   <div>
     <label for="js-temp">Temp (&deg;C): </label> <input type="text" id="js-temp" name="temp" maxlength="5" value="<?php echo $account->tubTime ? $account->tubTime['temp'] : $account->settings['defaultTemp']['value']; ?>" />
   </div>
+  <?php if($startTime): ?>
+    <div style="margin:15px 0;">
+      The tub should be turned on approximately <?php echo date('H:i', $startTime) . (date('m-d') !== date('m-d', $startTime) ? ' (on ' . date('F jS', $startTime) . ')' : '') ?>.
+    </div>
+  <?php endif; ?>
   <input type="submit" value="OK" />
-  <?php if($account->tubTime): ?><input type="submit" name="delete" value="Delete time" /> <?php endif; ?>
+  <?php if($account->tubTime): ?>
+    <input type="submit" name="delete" value="Delete time" />
+  <?php endif; ?>
 </form>
 <?php endif; ?>

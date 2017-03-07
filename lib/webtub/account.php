@@ -204,7 +204,7 @@ class account {
   }
 
   // Get next tub time from db
-  private function getTubTime()
+  public function getTubTime()
   {
     try
     {
