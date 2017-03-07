@@ -13,7 +13,7 @@ $(document).ready(function(){
     setInterval(function(){
       getCurrent();
     }
-    , 120000);
+    , 60000);
     setTimeout(function(){
       getCurrent();
     }

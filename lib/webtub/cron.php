@@ -73,7 +73,7 @@ class cron
           $currentTubTemp = floatval($this->telldusData->getSensorTemp($settings['tubSensorId'], $tubLastChecked));
           $currentAirTemp = floatval($this->telldusData->getSensorTemp($settings['airSensorId']));
           $tubShouldBeTurnedOn = tub::tubOnOrOff($currentTubTemp, $currentAirTemp, $futureInactiveTubTime['temp'], $futureInactiveTubTime['time'], $tubLastChecked, $settings);
-          logger::log("Inactive tubtime should be turned on: " . $tubShouldBeTurnedOn, DEBUG);
+          logger::log("Inactive tubtime should be turned on: " . ($tubShouldBeTurnedOn ? 'true' : 'false'), DEBUG);
           if($tubShouldBeTurnedOn)
           {
             if($this->turnTubOnOrOff($settings['tubDeviceId'], true))

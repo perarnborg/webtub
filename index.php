@@ -98,6 +98,7 @@ else
               $account->initTelldusData();
               if(tub::tubOnOrOff($account->telldusData->data['tubTemp'], $account->telldusData->data['airTemp'], $temp, $time, time(), $account->settings)) {
                 $account->telldusData->turnOnDevice($account->settings['tubDeviceId']['value']);
+                logger::log('Successfully turned on device '.$account->settings['tubDeviceId']['value'] . ' when saving tub time', DEBUG);
                 $tubTime = $account->getTubTime();
                 tub::markTubTimeAsActivated($tubTime['id']);
               }
