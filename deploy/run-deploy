@@ -6,7 +6,7 @@ export DEPLOY_SOURCE_DIR="$DIR/../"
 export DEPLOY_DEST_DIR="/var/www/webtub/"
 export DEPLOY_SERVER="54.228.219.51"
 export DEPLOY_ACCOUNT="ubuntu"
-export DEPLOY_KEY="/Users/per/.ssh/perarnborg.pem"
+export DEPLOY_KEY="/Users/per/.ssh/perarnborg2018.pem"
 
 echo "deploying to $DEPLOY_SERVER"
    echo "using manual password"
